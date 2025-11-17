@@ -1,0 +1,181 @@
+<div class="product-detail-container">
+  <p-toast></p-toast>
+
+  <!-- Back Button -->
+  <div class="back-button-section">
+    <button
+      pButton
+      type="button"
+      icon="pi pi-arrow-left"
+      label="Back to Products"
+      class="p-button-text"
+      (click)="goBack()"
+    ></button>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="detail-card">
+      <div class="product-detail-grid">
+        <div class="image-section">
+          <p-skeleton width="100%" height="500px"></p-skeleton>
+        </div>
+        <div class="info-section">
+          <p-skeleton width="70%" height="2.5rem" styleClass="p-mb-3"></p-skeleton>
+          <p-skeleton width="40%" height="2rem" styleClass="p-mb-3"></p-skeleton>
+          <p-skeleton width="100%" height="6rem" styleClass="p-mb-3"></p-skeleton>
+          <p-skeleton width="60%" height="3rem"></p-skeleton>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Product Details -->
+  @if (!loading && product) {
+    <div class="detail-card">
+      <div class="product-detail-grid">
+        <!-- Product Image -->
+        <div class="image-section">
+          @if (product.imageUrl) {
+            <img [src]="product.imageUrl" [alt]="product.name" class="product-image" />
+          } @else {
+            <div class="no-image">
+              <i class="pi pi-image"></i>
+              <span>No Image Available</span>
+            </div>
+          }
+        </div>
+
+        <!-- Product Information -->
+        <div class="info-section">
+          <!-- Product Name -->
+          <h1 class="product-name">{{ product.name }}</h1>
+
+          <!-- Stock Status -->
+          <div class="stock-status">
+            <p-tag
+              [value]="getStockLabel(product.stock)"
+              [severity]="getStockSeverity(product.stock)"
+              [icon]="getStockIcon(product.stock)"
+            ></p-tag>
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Price -->
+          <div class="price-section">
+            <span class="price-label">Price:</span>
+            <span class="product-price">${{ product.price | number:'1.2-2' }}</span>
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Description -->
+          <div class="description-section">
+            <h3>Description</h3>
+            <p class="product-description">{{ product.description }}</p>
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Product Meta -->
+          <div class="product-meta">
+            <div class="meta-item">
+              <i class="pi pi-tag"></i>
+              <span>Product ID:</span>
+              <strong>{{ product.id }}</strong>
+            </div>
+            <div class="meta-item">
+              <i class="pi pi-box"></i>
+              <span>Available Stock:</span>
+              <strong>{{ product.stock }} units</strong>
+            </div>
+            @if (product.createdAt) {
+              <div class="meta-item">
+                <i class="pi pi-calendar"></i>
+                <span>Added on:</span>
+                <strong>{{ product.createdAt | date:'mediumDate' }}</strong>
+              </div>
+            }
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Quantity Selector and Add to Cart -->
+          <div class="action-section">
+            <div class="quantity-selector">
+              <label for="quantity">Quantity:</label>
+              <p-inputNumber
+                inputId="quantity"
+                [(ngModel)]="quantity"
+                [min]="1"
+                [max]="product.stock"
+                [showButtons]="true"
+                buttonLayout="horizontal"
+                spinnerMode="horizontal"
+                decrementButtonClass="p-button-danger"
+                incrementButtonClass="p-button-success"
+                incrementButtonIcon="pi pi-plus"
+                decrementButtonIcon="pi pi-minus"
+                [disabled]="product.stock <= 0"
+              ></p-inputNumber>
+            </div>
+
+            <div class="action-buttons">
+              <button
+                pButton
+                type="button"
+                label="Add to Cart"
+                icon="pi pi-shopping-cart"
+                class="p-button-lg add-to-cart-btn"
+                [disabled]="!isQuantityValid() || product.stock <= 0"
+                (click)="addToCart()"
+              ></button>
+
+              <button
+                pButton
+                type="button"
+                label="View Cart"
+                icon="pi pi-eye"
+                class="p-button-lg p-button-outlined"
+                (click)="goToCart()"
+              ></button>
+            </div>
+          </div>
+
+          <!-- Stock Warning -->
+          @if (product.stock > 0 && product.stock <= 10) {
+            <div class="stock-warning">
+              <i class="pi pi-exclamation-triangle"></i>
+              <span>Hurry! Only {{ product.stock }} items left in stock.</span>
+            </div>
+          }
+
+          <!-- Out of Stock Message -->
+          @if (product.stock <= 0) {
+            <div class="out-of-stock-message">
+              <i class="pi pi-times-circle"></i>
+              <span>This product is currently out of stock.</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (!loading && !product) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-circle"></i>
+      <h2>Product Not Found</h2>
+      <p>The product you're looking for doesn't exist or has been removed.</p>
+      <button
+        pButton
+        type="button"
+        label="Back to Products"
+        icon="pi pi-arrow-left"
+        (click)="goBack()"
+      ></button>
+    </div>
+  }
+</div>

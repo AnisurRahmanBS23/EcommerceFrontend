@@ -1,0 +1,199 @@
+<div class="product-list-container">
+  <p-toast></p-toast>
+
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1>Product Catalog</h1>
+    <p class="subtitle">Discover our amazing collection of products</p>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <!-- Search -->
+      <div class="search-box">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            type="text"
+            pInputText
+            placeholder="Search products..."
+            [formControl]="searchControl"
+            class="search-input"
+          />
+        </span>
+      </div>
+
+      <!-- Sort -->
+      <div class="sort-box">
+        <p-dropdown
+          [options]="sortOptions"
+          [(ngModel)]="selectedSort"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Sort by"
+          (onChange)="onSortChange()"
+          [style]="{'width': '100%'}"
+        ></p-dropdown>
+      </div>
+
+      <!-- Stock Filter -->
+      <div class="stock-filter">
+        <p-selectButton
+          [options]="stockOptions"
+          [(ngModel)]="inStockOnly"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onStockFilterChange()"
+        ></p-selectButton>
+      </div>
+    </div>
+
+    <!-- Price Filter Row -->
+    <div class="price-filter-row">
+      <div class="price-inputs">
+        <div class="price-input-group">
+          <label>Min Price</label>
+          <p-inputNumber
+            [(ngModel)]="minPrice"
+            mode="currency"
+            currency="USD"
+            locale="en-US"
+            [min]="0"
+            placeholder="$0"
+          ></p-inputNumber>
+        </div>
+
+        <div class="price-input-group">
+          <label>Max Price</label>
+          <p-inputNumber
+            [(ngModel)]="maxPrice"
+            mode="currency"
+            currency="USD"
+            locale="en-US"
+            [min]="0"
+            placeholder="Any"
+          ></p-inputNumber>
+        </div>
+
+        <button
+          pButton
+          type="button"
+          label="Apply"
+          icon="pi pi-filter"
+          class="p-button-sm"
+          (click)="applyPriceFilter()"
+        ></button>
+
+        <button
+          pButton
+          type="button"
+          label="Clear Filters"
+          icon="pi pi-times"
+          class="p-button-sm p-button-outlined"
+          (click)="clearFilters()"
+        ></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products DataView -->
+  <p-dataView
+    #dv
+    [value]="products"
+    [paginator]="true"
+    [rows]="pageSize"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="onPageChange($event)"
+    [loading]="loading"
+    layout="grid"
+  >
+    <!-- Header Template -->
+    <ng-template pTemplate="header">
+      <div class="dataview-header">
+        <span class="results-count">
+          {{ totalRecords }} Products Found
+        </span>
+      </div>
+    </ng-template>
+
+    <!-- Grid View Template -->
+    <ng-template let-product pTemplate="gridItem">
+      <div class="product-card">
+        <div class="product-image-wrapper" (click)="viewProductDetail(product.id)">
+          @if (product.imageUrl) {
+            <img [src]="product.imageUrl" [alt]="product.name" class="product-image" />
+          } @else {
+            <div class="no-image">
+              <i class="pi pi-image"></i>
+              <span>No Image</span>
+            </div>
+          }
+
+          <!-- Stock Badge -->
+          <p-tag
+            [value]="getStockLabel(product.stock)"
+            [severity]="getStockSeverity(product.stock)"
+            class="stock-badge"
+          ></p-tag>
+        </div>
+
+        <div class="product-details">
+          <h3 class="product-name" (click)="viewProductDetail(product.id)">
+            {{ product.name }}
+          </h3>
+
+          <p class="product-description">
+            {{ product.description | slice:0:80 }}{{ product.description.length > 80 ? '...' : '' }}
+          </p>
+
+          <div class="product-footer">
+            <span class="product-price">${{ product.price | number:'1.2-2' }}</span>
+
+            <button
+              pButton
+              type="button"
+              icon="pi pi-shopping-cart"
+              label="Add to Cart"
+              class="p-button-sm"
+              [disabled]="product.stock <= 0"
+              (click)="addToCart(product)"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Loading Template -->
+    <ng-template pTemplate="loading">
+      <div class="loading-container">
+        <div class="product-card" *ngFor="let item of [1,2,3,4,5,6,7,8]">
+          <p-skeleton width="100%" height="200px"></p-skeleton>
+          <div class="p-mt-2">
+            <p-skeleton width="80%" height="1.5rem"></p-skeleton>
+            <p-skeleton width="60%" height="1rem" styleClass="p-mt-2"></p-skeleton>
+            <p-skeleton width="40%" height="1rem" styleClass="p-mt-2"></p-skeleton>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Empty Template -->
+    <ng-template pTemplate="empty">
+      <div class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <h3>No Products Found</h3>
+        <p>Try adjusting your search or filters</p>
+        <button
+          pButton
+          type="button"
+          label="Clear All Filters"
+          icon="pi pi-refresh"
+          class="p-button-outlined"
+          (click)="clearFilters()"
+        ></button>
+      </div>
+    </ng-template>
+  </p-dataView>
+</div>
