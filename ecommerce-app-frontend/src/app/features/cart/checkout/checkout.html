@@ -1,1 +1,292 @@
-<p>checkout works!</p>
+<div class="checkout-container">
+  <p-toast></p-toast>
+
+  <!-- Success State -->
+  @if (orderPlaced) {
+    <div class="success-container">
+      <p-card>
+        <div class="success-content">
+          <i class="pi pi-check-circle success-icon"></i>
+          <h1>Order Placed Successfully!</h1>
+          <p class="order-number">Order #{{ orderId }}</p>
+          <p class="success-message">
+            Thank you for your purchase! Your order has been confirmed and will be shipped soon.
+            You will receive an email confirmation shortly.
+          </p>
+          <div class="success-actions">
+            <button
+              pButton
+              type="button"
+              label="View Order Details"
+              icon="pi pi-eye"
+              class="p-button-lg"
+              (click)="viewOrders()"
+            ></button>
+            <button
+              pButton
+              type="button"
+              label="Continue Shopping"
+              icon="pi pi-shopping-bag"
+              class="p-button-outlined p-button-lg"
+              (click)="router.navigate(['/products'])"
+            ></button>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  }
+
+  <!-- Checkout Form -->
+  @if (!orderPlaced) {
+    <div class="checkout-header">
+      <button
+        pButton
+        type="button"
+        icon="pi pi-arrow-left"
+        class="p-button-text"
+        (click)="backToCart()"
+      ></button>
+      <h1><i class="pi pi-credit-card"></i> Checkout</h1>
+      <div></div>
+    </div>
+
+    <div class="checkout-content">
+      <!-- Shipping Form -->
+      <div class="checkout-form">
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3><i class="pi pi-map-marker"></i> Shipping Information</h3>
+          </ng-template>
+
+          <form [formGroup]="checkoutForm">
+            <!-- Contact Information -->
+            <div class="form-section">
+              <h4>Contact Details</h4>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="fullName">Full Name *</label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    pInputText
+                    formControlName="fullName"
+                    placeholder="John Doe"
+                    [class.p-invalid]="isFieldInvalid('fullName')"
+                  />
+                  @if (isFieldInvalid('fullName')) {
+                    <small class="p-error">{{ getFieldError('fullName') }}</small>
+                  }
+                </div>
+
+                <div class="form-field">
+                  <label for="email">Email Address *</label>
+                  <input
+                    id="email"
+                    type="email"
+                    pInputText
+                    formControlName="email"
+                    placeholder="john@example.com"
+                    [class.p-invalid]="isFieldInvalid('email')"
+                  />
+                  @if (isFieldInvalid('email')) {
+                    <small class="p-error">{{ getFieldError('email') }}</small>
+                  }
+                </div>
+
+                <div class="form-field">
+                  <label for="phone">Phone Number *</label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    pInputText
+                    formControlName="phone"
+                    placeholder="1234567890"
+                    [class.p-invalid]="isFieldInvalid('phone')"
+                  />
+                  @if (isFieldInvalid('phone')) {
+                    <small class="p-error">{{ getFieldError('phone') }}</small>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <p-divider></p-divider>
+
+            <!-- Shipping Address -->
+            <div class="form-section">
+              <h4>Shipping Address</h4>
+              <div class="form-grid">
+                <div class="form-field full-width">
+                  <label for="addressLine1">Address Line 1 *</label>
+                  <input
+                    id="addressLine1"
+                    type="text"
+                    pInputText
+                    formControlName="addressLine1"
+                    placeholder="123 Main Street"
+                    [class.p-invalid]="isFieldInvalid('addressLine1')"
+                  />
+                  @if (isFieldInvalid('addressLine1')) {
+                    <small class="p-error">{{ getFieldError('addressLine1') }}</small>
+                  }
+                </div>
+
+                <div class="form-field full-width">
+                  <label for="addressLine2">Address Line 2 (Optional)</label>
+                  <input
+                    id="addressLine2"
+                    type="text"
+                    pInputText
+                    formControlName="addressLine2"
+                    placeholder="Apartment, suite, etc."
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label for="city">City *</label>
+                  <input
+                    id="city"
+                    type="text"
+                    pInputText
+                    formControlName="city"
+                    placeholder="New York"
+                    [class.p-invalid]="isFieldInvalid('city')"
+                  />
+                  @if (isFieldInvalid('city')) {
+                    <small class="p-error">{{ getFieldError('city') }}</small>
+                  }
+                </div>
+
+                <div class="form-field">
+                  <label for="state">State *</label>
+                  <input
+                    id="state"
+                    type="text"
+                    pInputText
+                    formControlName="state"
+                    placeholder="NY"
+                    [class.p-invalid]="isFieldInvalid('state')"
+                  />
+                  @if (isFieldInvalid('state')) {
+                    <small class="p-error">{{ getFieldError('state') }}</small>
+                  }
+                </div>
+
+                <div class="form-field">
+                  <label for="zipCode">ZIP Code *</label>
+                  <input
+                    id="zipCode"
+                    type="text"
+                    pInputText
+                    formControlName="zipCode"
+                    placeholder="10001"
+                    [class.p-invalid]="isFieldInvalid('zipCode')"
+                  />
+                  @if (isFieldInvalid('zipCode')) {
+                    <small class="p-error">{{ getFieldError('zipCode') }}</small>
+                  }
+                </div>
+
+                <div class="form-field full-width">
+                  <label for="country">Country *</label>
+                  <input
+                    id="country"
+                    type="text"
+                    pInputText
+                    formControlName="country"
+                    placeholder="United States"
+                    [class.p-invalid]="isFieldInvalid('country')"
+                  />
+                  @if (isFieldInvalid('country')) {
+                    <small class="p-error">{{ getFieldError('country') }}</small>
+                  }
+                </div>
+              </div>
+            </div>
+          </form>
+        </p-card>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3>Order Summary</h3>
+          </ng-template>
+
+          <!-- Cart Items Preview -->
+          <div class="summary-items">
+            @for (item of cartItems; track item.productId) {
+              <div class="summary-item">
+                <div class="item-image">
+                  @if (item.imageUrl) {
+                    <img [src]="item.imageUrl" [alt]="item.productName" />
+                  } @else {
+                    <div class="no-image">
+                      <i class="pi pi-image"></i>
+                    </div>
+                  }
+                  <span class="item-quantity">{{ item.quantity }}</span>
+                </div>
+                <div class="item-info">
+                  <p class="item-name">{{ item.productName }}</p>
+                  <p class="item-price">${{ item.price | number:'1.2-2' }} each</p>
+                </div>
+                <div class="item-total">
+                  ${{ (item.price * item.quantity) | number:'1.2-2' }}
+                </div>
+              </div>
+            }
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Pricing -->
+          <div class="summary-pricing">
+            <div class="price-row">
+              <span>Subtotal:</span>
+              <span>${{ getSubtotal() | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row">
+              <span>Tax (8%):</span>
+              <span>${{ getTax() | number:'1.2-2' }}</span>
+            </div>
+            <div class="price-row">
+              <span>Shipping:</span>
+              <span>
+                @if (getShipping() === 0) {
+                  <span class="free-shipping">FREE</span>
+                } @else {
+                  ${{ getShipping() | number:'1.2-2' }}
+                }
+              </span>
+            </div>
+            <p-divider></p-divider>
+            <div class="price-row total-row">
+              <span>Total:</span>
+              <span class="total-amount">${{ getTotal() | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <ng-template pTemplate="footer">
+            <button
+              pButton
+              type="button"
+              label="Place Order"
+              icon="pi pi-check"
+              class="p-button-lg place-order-btn"
+              [disabled]="loading || cartItems.length === 0"
+              [loading]="loading"
+              (click)="placeOrder()"
+            ></button>
+
+            <div class="secure-notice">
+              <i class="pi pi-lock"></i>
+              <span>Secure Checkout</span>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+    </div>
+  }
+</div>

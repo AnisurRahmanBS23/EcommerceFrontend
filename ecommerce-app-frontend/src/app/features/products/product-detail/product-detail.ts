@@ -159,9 +159,9 @@ export class ProductDetail implements OnInit, OnDestroy {
   /**
    * Get stock severity for tag
    */
-  getStockSeverity(stock: number): 'success' | 'warning' | 'danger' {
+  getStockSeverity(stock: number): 'success' | 'warn' | 'danger' {
     if (stock > 10) return 'success';
-    if (stock > 0) return 'warning';
+    if (stock > 0) return 'warn';
     return 'danger';
   }
 

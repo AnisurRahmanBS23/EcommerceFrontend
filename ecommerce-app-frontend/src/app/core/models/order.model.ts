@@ -24,9 +24,8 @@ export interface OrderItem {
 }
 
 export interface CreateOrderDto {
-  customerName: string;
-  customerEmail: string;
   shippingAddress: string;
+  totalAmount: number;
   items: OrderItemDto[];
 }
 

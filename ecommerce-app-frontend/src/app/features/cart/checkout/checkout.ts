@@ -1,11 +1,253 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
+
+// PrimeNG Imports
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { DividerModule } from 'primeng/divider';
+import { StepperModule } from 'primeng/stepper';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
+// Services & Models
+import { OrderService } from '../../../core/services/order.service';
+import { CartService } from '../../../core/services/cart.service';
+import { CartItem } from '../../../core/models/cart.model';
+import { CreateOrderDto } from '../../../core/models/order.model';
 
 @Component({
   selector: 'app-checkout',
-  imports: [],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonModule,
+    CardModule,
+    InputTextModule,
+    ToastModule,
+    DividerModule,
+    StepperModule,
+    ProgressSpinnerModule
+  ],
+  providers: [MessageService],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss',
 })
-export class Checkout {
+export class Checkout implements OnInit, OnDestroy {
+  checkoutForm!: FormGroup;
+  cartItems: CartItem[] = [];
+  loading = false;
+  orderPlaced = false;
+  orderId: string = '';
+  private destroy$ = new Subject<void>();
 
+  constructor(
+    private fb: FormBuilder,
+    private orderService: OrderService,
+    private cartService: CartService,
+    private messageService: MessageService,
+    public router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.initializeForm();
+    this.loadCartItems();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Initialize checkout form
+   */
+  initializeForm(): void {
+    this.checkoutForm = this.fb.group({
+      fullName: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      addressLine1: ['', [Validators.required, Validators.minLength(5)]],
+      addressLine2: [''],
+      city: ['', [Validators.required, Validators.minLength(2)]],
+      state: ['', [Validators.required, Validators.minLength(2)]],
+      zipCode: ['', [Validators.required, Validators.pattern(/^\d{5}(-\d{4})?$/)]],
+      country: ['United States', Validators.required]
+    });
+  }
+
+  /**
+   * Load cart items
+   */
+  loadCartItems(): void {
+    this.cartService.cartItems$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(items => {
+        this.cartItems = items;
+        if (items.length === 0) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Empty Cart',
+            detail: 'Your cart is empty. Redirecting to products...'
+          });
+          setTimeout(() => {
+            this.router.navigate(['/products']);
+          }, 2000);
+        }
+      });
+  }
+
+  /**
+   * Place order
+   */
+  placeOrder(): void {
+    if (this.checkoutForm.invalid) {
+      this.markFormGroupTouched(this.checkoutForm);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Form Invalid',
+        detail: 'Please fill in all required fields correctly.'
+      });
+      return;
+    }
+
+    if (this.cartItems.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Empty Cart',
+        detail: 'Your cart is empty.'
+      });
+      return;
+    }
+
+    this.loading = true;
+
+    const formValue = this.checkoutForm.value;
+    const shippingAddress = `${formValue.addressLine1}, ${formValue.addressLine2 ? formValue.addressLine2 + ', ' : ''}${formValue.city}, ${formValue.state} ${formValue.zipCode}, ${formValue.country}`;
+
+    const orderDto: CreateOrderDto = {
+      items: this.cartItems.map(item => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        price: item.price,
+        imageUrl: item.imageUrl
+      })),
+      shippingAddress: shippingAddress,
+      totalAmount: this.getTotal()
+    };
+
+    this.orderService.createOrder(orderDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (order) => {
+          this.loading = false;
+          this.orderPlaced = true;
+          this.orderId = order.id;
+
+          // Clear cart after successful order
+          this.cartService.clearCart();
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Order Placed',
+            detail: `Order #${order.id} has been placed successfully!`
+          });
+
+          // Redirect to order details after 3 seconds
+          setTimeout(() => {
+            this.router.navigate(['/orders', order.id]);
+          }, 3000);
+        },
+        error: (error) => {
+          console.error('Error placing order:', error);
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Order Failed',
+            detail: 'Failed to place order. Please try again.'
+          });
+        }
+      });
+  }
+
+  /**
+   * Mark all form fields as touched to show validation errors
+   */
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+    });
+  }
+
+  /**
+   * Check if form field is invalid and touched
+   */
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.checkoutForm.get(fieldName);
+    return !!(field?.invalid && field?.touched);
+  }
+
+  /**
+   * Get field error message
+   */
+  getFieldError(fieldName: string): string {
+    const field = this.checkoutForm.get(fieldName);
+    if (field?.hasError('required')) return `${fieldName} is required`;
+    if (field?.hasError('email')) return 'Invalid email format';
+    if (field?.hasError('pattern')) {
+      if (fieldName === 'phone') return 'Phone must be 10 digits';
+      if (fieldName === 'zipCode') return 'Invalid ZIP code format';
+    }
+    if (field?.hasError('minLength')) return `${fieldName} is too short`;
+    return '';
+  }
+
+  /**
+   * Calculate subtotal
+   */
+  getSubtotal(): number {
+    return this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }
+
+  /**
+   * Calculate tax (8%)
+   */
+  getTax(): number {
+    return this.getSubtotal() * 0.08;
+  }
+
+  /**
+   * Calculate shipping (free over $50)
+   */
+  getShipping(): number {
+    const subtotal = this.getSubtotal();
+    return subtotal > 50 ? 0 : 5.99;
+  }
+
+  /**
+   * Calculate total
+   */
+  getTotal(): number {
+    return this.getSubtotal() + this.getTax() + this.getShipping();
+  }
+
+  /**
+   * Go back to cart
+   */
+  backToCart(): void {
+    this.router.navigate(['/cart']);
+  }
+
+  /**
+   * View orders
+   */
+  viewOrders(): void {
+    this.router.navigate(['/orders']);
+  }
 }

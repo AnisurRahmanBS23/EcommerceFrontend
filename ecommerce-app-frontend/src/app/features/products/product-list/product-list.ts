@@ -8,7 +8,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { DataViewModule } from 'primeng/dataview';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
+import { Select } from 'primeng/select';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { RatingModule } from 'primeng/rating';
 import { TagModule } from 'primeng/tag';
@@ -37,7 +37,7 @@ interface SortOption {
     DataViewModule,
     ButtonModule,
     InputTextModule,
-    DropdownModule,
+    Select,
     SelectButtonModule,
     RatingModule,
     TagModule,
@@ -249,9 +249,9 @@ export class ProductList implements OnInit, OnDestroy {
   /**
    * Get stock severity for tag
    */
-  getStockSeverity(stock: number): 'success' | 'warning' | 'danger' {
+  getStockSeverity(stock: number): 'success' | 'warn' | 'danger' {
     if (stock > 10) return 'success';
-    if (stock > 0) return 'warning';
+    if (stock > 0) return 'warn';
     return 'danger';
   }
 

@@ -1,1 +1,249 @@
-<p>product-management works!</p>
+<div class="product-management-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div class="management-header">
+    <h1><i class="pi pi-box"></i> Product Management</h1>
+    <p class="subtitle">Manage your product catalog</p>
+  </div>
+
+  <!-- Toolbar -->
+  <p-toolbar>
+    <ng-template pTemplate="left">
+      <button
+        pButton
+        type="button"
+        label="New Product"
+        icon="pi pi-plus"
+        class="p-button-success"
+        (click)="openNewProductDialog()"
+      ></button>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <button
+        pButton
+        type="button"
+        icon="pi pi-refresh"
+        class="p-button-outlined"
+        (click)="loadProducts()"
+        pTooltip="Refresh"
+        tooltipPosition="bottom"
+      ></button>
+    </ng-template>
+  </p-toolbar>
+
+  <!-- Products Table -->
+  <p-table
+    [value]="products"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [loading]="loading"
+    styleClass="p-datatable-products"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 60px">Image</th>
+        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+        <th>Description</th>
+        <th pSortableColumn="price">Price <p-sortIcon field="price"></p-sortIcon></th>
+        <th pSortableColumn="stock">Stock <p-sortIcon field="stock"></p-sortIcon></th>
+        <th>Status</th>
+        <th style="width: 150px">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-product>
+      <tr>
+        <td>
+          <div class="product-image">
+            @if (product.imageUrl) {
+              <img [src]="product.imageUrl" [alt]="product.name" />
+            } @else {
+              <div class="no-image">
+                <i class="pi pi-image"></i>
+              </div>
+            }
+          </div>
+        </td>
+        <td>
+          <span class="product-name">{{ product.name }}</span>
+        </td>
+        <td>
+          <span class="product-description">
+            {{ product.description | slice:0:80 }}{{ product.description.length > 80 ? '...' : '' }}
+          </span>
+        </td>
+        <td>
+          <span class="product-price">${{ product.price | number:'1.2-2' }}</span>
+        </td>
+        <td>
+          <span class="product-stock">{{ product.stock }}</span>
+        </td>
+        <td>
+          <p-tag
+            [value]="getStockLabel(product.stock)"
+            [severity]="getStockSeverity(product.stock)"
+          ></p-tag>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-sm p-button-text p-button-warning"
+              pTooltip="Edit"
+              tooltipPosition="top"
+              (click)="openEditProductDialog(product)"
+            ></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-sm p-button-text p-button-danger"
+              pTooltip="Delete"
+              tooltipPosition="top"
+              (click)="confirmDeleteProduct(product)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-inbox empty-icon"></i>
+            <p>No products found. Create your first product!</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- Product Dialog (Create/Edit) -->
+  <p-dialog
+    [(visible)]="displayDialog"
+    [header]="isEditMode ? 'Edit Product' : 'Create New Product'"
+    [modal]="true"
+    [style]="{ width: '600px' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <form [formGroup]="productForm" (ngSubmit)="saveProduct()">
+      <div class="form-grid">
+        <!-- Product Name -->
+        <div class="form-field">
+          <label for="name">Product Name *</label>
+          <input
+            id="name"
+            type="text"
+            pInputText
+            formControlName="name"
+            placeholder="Enter product name"
+            [class.p-invalid]="isFieldInvalid('name')"
+          />
+          @if (isFieldInvalid('name')) {
+            <small class="p-error">Product name is required (min 3 characters)</small>
+          }
+        </div>
+
+        <!-- Product Description -->
+        <div class="form-field">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            pInputTextarea
+            formControlName="description"
+            placeholder="Enter product description"
+            rows="4"
+            [class.p-invalid]="isFieldInvalid('description')"
+          ></textarea>
+          @if (isFieldInvalid('description')) {
+            <small class="p-error">Description is required (min 10 characters)</small>
+          }
+        </div>
+
+        <!-- Price and Stock Row -->
+        <div class="form-row">
+          <div class="form-field">
+            <label for="price">Price *</label>
+            <p-inputNumber
+              id="price"
+              formControlName="price"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              [min]="0"
+              [class.p-invalid]="isFieldInvalid('price')"
+            ></p-inputNumber>
+            @if (isFieldInvalid('price')) {
+              <small class="p-error">Price must be greater than 0</small>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="stock">Stock *</label>
+            <p-inputNumber
+              id="stock"
+              formControlName="stock"
+              [showButtons]="true"
+              [min]="0"
+              [class.p-invalid]="isFieldInvalid('stock')"
+            ></p-inputNumber>
+            @if (isFieldInvalid('stock')) {
+              <small class="p-error">Stock must be 0 or greater</small>
+            }
+          </div>
+        </div>
+
+        <!-- Image URL -->
+        <div class="form-field">
+          <label for="imageUrl">Image URL *</label>
+          <input
+            id="imageUrl"
+            type="text"
+            pInputText
+            formControlName="imageUrl"
+            placeholder="https://example.com/image.jpg"
+            [class.p-invalid]="isFieldInvalid('imageUrl')"
+          />
+          @if (isFieldInvalid('imageUrl')) {
+            <small class="p-error">Image URL is required</small>
+          }
+        </div>
+
+        <!-- Image Preview -->
+        @if (productForm.get('imageUrl')?.value) {
+          <div class="image-preview">
+            <label>Image Preview:</label>
+            <img [src]="productForm.get('imageUrl')?.value" alt="Product Preview" />
+          </div>
+        }
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="hideDialog()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        [label]="isEditMode ? 'Update' : 'Create'"
+        icon="pi pi-check"
+        (click)="saveProduct()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

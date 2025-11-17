@@ -26,7 +26,7 @@
 
       <!-- Sort -->
       <div class="sort-box">
-        <p-dropdown
+        <p-select
           [options]="sortOptions"
           [(ngModel)]="selectedSort"
           optionLabel="label"
@@ -34,7 +34,7 @@
           placeholder="Sort by"
           (onChange)="onSortChange()"
           [style]="{'width': '100%'}"
-        ></p-dropdown>
+        ></p-select>
       </div>
 
       <!-- Stock Filter -->

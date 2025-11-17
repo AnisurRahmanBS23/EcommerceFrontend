@@ -1,0 +1,279 @@
+.order-detail-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 70vh;
+}
+
+// Header
+.order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+
+  .header-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin: 0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .status-tag {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Order Content Layout
+.order-content {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Main Column
+.order-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    padding: 1rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      color: var(--primary-color);
+    }
+  }
+}
+
+// Order Items
+.order-items {
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .item-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .item-quantity {
+        font-size: 0.9rem;
+        color: #6c757d;
+      }
+    }
+
+    .item-pricing {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+
+      @media (max-width: 768px) {
+        align-items: flex-start;
+      }
+
+      .item-price {
+        font-size: 0.9rem;
+        color: #6c757d;
+      }
+
+      .item-total {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+    }
+  }
+}
+
+// Shipping Info
+.shipping-info {
+  padding: 1rem 0;
+
+  .address-text {
+    font-size: 1.05rem;
+    color: #495057;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// Timeline
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .timeline-status {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+  }
+
+  .timeline-date {
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
+}
+
+// Sidebar
+.order-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 2rem;
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    padding: 1rem;
+    margin: 0;
+  }
+
+  .summary-details {
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      font-size: 1rem;
+      color: #495057;
+
+      .value {
+        font-weight: 600;
+        color: #2c3e50;
+        text-align: right;
+      }
+
+      .total-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  .continue-btn {
+    width: 100%;
+  }
+}
+
+// Help Card
+.help-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  .help-content {
+    text-align: center;
+    color: white;
+
+    .help-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    h4 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+
+    button {
+      color: white;
+    }
+  }
+}
+
+// Loading State
+.loading-state {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// PrimeNG Overrides
+::ng-deep {
+  .p-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+
+    .p-card-body {
+      padding: 1.5rem;
+    }
+
+    .p-card-header {
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .p-card-footer {
+      border-top: none;
+      padding-top: 0;
+    }
+  }
+
+  .custom-marker {
+    display: flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 50%;
+    z-index: 1;
+
+    i {
+      font-size: 1.2rem;
+    }
+  }
+
+  .p-timeline {
+    .p-timeline-event-content {
+      padding-left: 1rem;
+    }
+  }
+
+  .help-card {
+    .p-card-body {
+      padding: 2rem 1.5rem;
+    }
+  }
+}
