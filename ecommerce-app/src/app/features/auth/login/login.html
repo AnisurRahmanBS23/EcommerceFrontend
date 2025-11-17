@@ -1,0 +1,71 @@
+<div class="login-container">
+  <div class="login-wrapper">
+    <p-card header="Login" subheader="Welcome back! Please login to your account">
+      <ng-template pTemplate="content">
+        <form #loginForm="ngForm" (ngSubmit)="onLogin()">
+          <!-- Error Message -->
+          <p-message
+            *ngIf="errorMessage"
+            severity="error"
+            [text]="errorMessage"
+            styleClass="w-full mb-3">
+          </p-message>
+
+          <!-- Username/Email Input -->
+          <div class="field mb-4">
+            <label for="usernameOrEmail" class="block mb-2">Username or Email</label>
+            <input
+              pInputText
+              id="usernameOrEmail"
+              name="usernameOrEmail"
+              [(ngModel)]="loginRequest.usernameOrEmail"
+              type="text"
+              placeholder="Enter your username or email"
+              class="w-full"
+              required
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Password Input -->
+          <div class="field mb-4">
+            <label for="password" class="block mb-2">Password</label>
+            <p-password
+              id="password"
+              name="password"
+              [(ngModel)]="loginRequest.password"
+              placeholder="Enter your password"
+              [toggleMask]="true"
+              [feedback]="false"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              required
+              [disabled]="loading">
+            </p-password>
+          </div>
+
+          <!-- Submit Button -->
+          <p-button
+            type="submit"
+            label="Login"
+            icon="pi pi-sign-in"
+            [loading]="loading"
+            [disabled]="!loginForm.valid || loading"
+            styleClass="w-full">
+          </p-button>
+        </form>
+
+        <!-- Register Link -->
+        <div class="mt-3 text-center">
+          <span class="text-sm">Don't have an account? </span>
+          <a
+            href="javascript:void(0)"
+            (click)="navigateToRegister()"
+            class="text-primary font-medium text-sm">
+            Register here
+          </a>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>

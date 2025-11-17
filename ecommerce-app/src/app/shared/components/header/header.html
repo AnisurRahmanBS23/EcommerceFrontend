@@ -1,0 +1,68 @@
+<p-toolbar styleClass="custom-toolbar">
+  <ng-template pTemplate="left">
+    <div class="flex align-items-center gap-3">
+      <a
+        routerLink="/products"
+        class="text-2xl font-bold text-primary no-underline cursor-pointer">
+        <i class="pi pi-shopping-cart mr-2"></i>
+        E-Shop
+      </a>
+
+      <p-button
+        label="Products"
+        icon="pi pi-list"
+        [text]="true"
+        (onClick)="navigateToProducts()">
+      </p-button>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="right">
+    <div class="flex align-items-center gap-2">
+      <!-- Cart Button -->
+      <p-button
+        icon="pi pi-shopping-cart"
+        [text]="true"
+        [badge]="cartItemCount().toString()"
+        badgeClass="p-badge-danger"
+        (onClick)="navigateToCart()"
+        pTooltip="View Cart"
+        tooltipPosition="bottom">
+      </p-button>
+
+      <!-- Authenticated User Menu -->
+      <ng-container *ngIf="isAuthenticated(); else guestButtons">
+        <p-menu
+          #userMenu
+          [model]="userMenuItems"
+          [popup]="true"
+          appendTo="body">
+        </p-menu>
+
+        <p-button
+          icon="pi pi-user"
+          [text]="true"
+          (onClick)="userMenu.toggle($event)"
+          pTooltip="Account"
+          tooltipPosition="bottom">
+        </p-button>
+      </ng-container>
+
+      <!-- Guest Buttons -->
+      <ng-template #guestButtons>
+        <p-button
+          label="Login"
+          icon="pi pi-sign-in"
+          [text]="true"
+          (onClick)="navigateToLogin()">
+        </p-button>
+        <p-button
+          label="Register"
+          icon="pi pi-user-plus"
+          [outlined]="true"
+          (onClick)="navigateToRegister()">
+        </p-button>
+      </ng-template>
+    </div>
+  </ng-template>
+</p-toolbar>

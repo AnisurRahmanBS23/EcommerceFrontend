@@ -1,0 +1,112 @@
+<div class="register-container">
+  <div class="register-wrapper">
+    <p-card header="Register" subheader="Create a new account to get started">
+      <ng-template pTemplate="content">
+        <form #registerForm="ngForm" (ngSubmit)="onRegister()">
+          <!-- Error Message -->
+          <p-message
+            *ngIf="errorMessage"
+            severity="error"
+            [text]="errorMessage"
+            styleClass="w-full mb-3">
+          </p-message>
+
+          <!-- Success Message -->
+          <p-message
+            *ngIf="successMessage"
+            severity="success"
+            [text]="successMessage"
+            styleClass="w-full mb-3">
+          </p-message>
+
+          <!-- Username Input -->
+          <div class="field mb-4">
+            <label for="username" class="block mb-2">Username</label>
+            <input
+              pInputText
+              id="username"
+              name="username"
+              [(ngModel)]="registerRequest.username"
+              type="text"
+              placeholder="Enter your username"
+              class="w-full"
+              required
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Email Input -->
+          <div class="field mb-4">
+            <label for="email" class="block mb-2">Email</label>
+            <input
+              pInputText
+              id="email"
+              name="email"
+              [(ngModel)]="registerRequest.email"
+              type="email"
+              placeholder="Enter your email"
+              class="w-full"
+              required
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Password Input -->
+          <div class="field mb-4">
+            <label for="password" class="block mb-2">Password</label>
+            <p-password
+              id="password"
+              name="password"
+              [(ngModel)]="registerRequest.password"
+              placeholder="Enter your password"
+              [toggleMask]="true"
+              [feedback]="true"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              required
+              [disabled]="loading">
+            </p-password>
+          </div>
+
+          <!-- Confirm Password Input -->
+          <div class="field mb-4">
+            <label for="confirmPassword" class="block mb-2">Confirm Password</label>
+            <p-password
+              id="confirmPassword"
+              name="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              placeholder="Confirm your password"
+              [toggleMask]="true"
+              [feedback]="false"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              required
+              [disabled]="loading">
+            </p-password>
+          </div>
+
+          <!-- Submit Button -->
+          <p-button
+            type="submit"
+            label="Register"
+            icon="pi pi-user-plus"
+            [loading]="loading"
+            [disabled]="!registerForm.valid || loading"
+            styleClass="w-full">
+          </p-button>
+        </form>
+
+        <!-- Login Link -->
+        <div class="mt-3 text-center">
+          <span class="text-sm">Already have an account? </span>
+          <a
+            href="javascript:void(0)"
+            (click)="navigateToLogin()"
+            class="text-primary font-medium text-sm">
+            Login here
+          </a>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>
