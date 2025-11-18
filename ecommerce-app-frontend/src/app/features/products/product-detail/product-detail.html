@@ -37,11 +37,16 @@
         <!-- Product Image -->
         <div class="image-section">
           @if (product.imageUrl) {
-            <img [src]="product.imageUrl" [alt]="product.name" class="product-image" />
+            <img
+              [src]="product.imageUrl"
+              [alt]="product.name"
+              class="product-image"
+              (error)="onImageError($event)"
+            />
           } @else {
-            <div class="no-image">
-              <i class="pi pi-image"></i>
-              <span>No Image Available</span>
+            <div class="no-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); z-index: 1;">
+              <i class="pi pi-shopping-bag" style="font-size: 8rem; color: #adb5bd;"></i>
+              <span style="font-size: 1.2rem; color: #6c757d; font-weight: 500; margin-top: 1.5rem;">Image not available</span>
             </div>
           }
         </div>

@@ -5,12 +5,10 @@ import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 // PrimeNG Imports
-import { DataViewModule } from 'primeng/dataview';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { RatingModule } from 'primeng/rating';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
@@ -34,12 +32,10 @@ interface SortOption {
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    DataViewModule,
     ButtonModule,
     InputTextModule,
     Select,
     SelectButtonModule,
-    RatingModule,
     TagModule,
     SkeletonModule,
     ToastModule,
@@ -53,10 +49,8 @@ export class ProductList implements OnInit, OnDestroy {
   products: Product[] = [];
   loading = false;
 
-  // Pagination
-  currentPage = 1;
+  // Pagination (client-side since backend returns all products)
   pageSize = 12;
-  totalRecords = 0;
 
   // Search
   searchControl = new FormControl('');
@@ -111,7 +105,6 @@ export class ProductList implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.currentPage = 1;
         this.loadProducts();
       });
   }
@@ -125,8 +118,6 @@ export class ProductList implements OnInit, OnDestroy {
     const [sortBy, sortOrder] = this.parseSortOption(this.selectedSort);
 
     const queryParams: ProductQueryParams = {
-      page: this.currentPage,
-      pageSize: this.pageSize,
       search: this.searchControl.value || undefined,
       sortBy,
       sortOrder,
@@ -140,7 +131,6 @@ export class ProductList implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.products = response.items;
-          this.totalRecords = response.totalCount;
           this.loading = false;
         },
         error: (error) => {
@@ -164,19 +154,9 @@ export class ProductList implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle pagination
-   */
-  onPageChange(event: any): void {
-    this.currentPage = event.page + 1;
-    this.pageSize = event.rows;
-    this.loadProducts();
-  }
-
-  /**
    * Handle sort change
    */
   onSortChange(): void {
-    this.currentPage = 1;
     this.loadProducts();
   }
 
@@ -184,7 +164,6 @@ export class ProductList implements OnInit, OnDestroy {
    * Handle stock filter change
    */
   onStockFilterChange(): void {
-    this.currentPage = 1;
     this.loadProducts();
   }
 
@@ -192,7 +171,6 @@ export class ProductList implements OnInit, OnDestroy {
    * Apply price filters
    */
   applyPriceFilter(): void {
-    this.currentPage = 1;
     this.loadProducts();
   }
 
@@ -205,7 +183,6 @@ export class ProductList implements OnInit, OnDestroy {
     this.maxPrice = null;
     this.inStockOnly = false;
     this.selectedSort = 'date_desc';
-    this.currentPage = 1;
     this.loadProducts();
   }
 
@@ -262,5 +239,39 @@ export class ProductList implements OnInit, OnDestroy {
     if (stock > 10) return 'In Stock';
     if (stock > 0) return `Only ${stock} left`;
     return 'Out of Stock';
+  }
+
+  /**
+   * Handle image load error - show placeholder icon
+   */
+  onImageError(event: any): void {
+    const target = event.target as HTMLImageElement;
+    // Hide the broken image and show placeholder
+    target.style.display = 'none';
+    // Add placeholder icon to parent
+    const parent = target.parentElement;
+    if (parent && !parent.querySelector('.no-image')) {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'no-image';
+      placeholder.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        z-index: 1;
+        gap: 1rem;
+      `;
+      placeholder.innerHTML = `
+        <i class="pi pi-shopping-bag" style="font-size: 6rem; color: #adb5bd; line-height: 1;"></i>
+        <span style="font-size: 1rem; color: #6c757d; font-weight: 500; text-align: center;">Image not available</span>
+      `;
+      parent.appendChild(placeholder);
+    }
   }
 }

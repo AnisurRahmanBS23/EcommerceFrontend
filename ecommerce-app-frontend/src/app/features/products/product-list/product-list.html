@@ -12,12 +12,14 @@
     <div class="filter-row">
       <!-- Search -->
       <div class="search-box">
+        <label for="search-input">Search Products</label>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
           <input
+            id="search-input"
             type="text"
             pInputText
-            placeholder="Search products..."
+            placeholder="Search by name or description..."
             [formControl]="searchControl"
             class="search-input"
           />
@@ -26,12 +28,14 @@
 
       <!-- Sort -->
       <div class="sort-box">
+        <label for="sort-select">Sort By</label>
         <p-select
+          inputId="sort-select"
           [options]="sortOptions"
           [(ngModel)]="selectedSort"
           optionLabel="label"
           optionValue="value"
-          placeholder="Sort by"
+          placeholder="Select sorting"
           (onChange)="onSortChange()"
           [style]="{'width': '100%'}"
         ></p-select>
@@ -39,6 +43,7 @@
 
       <!-- Stock Filter -->
       <div class="stock-filter">
+        <label>Availability</label>
         <p-selectButton
           [options]="stockOptions"
           [(ngModel)]="inStockOnly"
@@ -51,6 +56,12 @@
 
     <!-- Price Filter Row -->
     <div class="price-filter-row">
+      <div class="price-filter-header">
+        <label class="price-filter-label">
+          <i class="pi pi-dollar"></i>
+          Price Range
+        </label>
+      </div>
       <div class="price-inputs">
         <div class="price-input-group">
           <label>Min Price</label>
@@ -79,55 +90,63 @@
         <button
           pButton
           type="button"
-          label="Apply"
-          icon="pi pi-filter"
-          class="p-button-sm"
+          label="Apply Filters"
+          icon="pi pi-check"
           (click)="applyPriceFilter()"
         ></button>
 
         <button
           pButton
           type="button"
-          label="Clear Filters"
+          label="Clear All"
           icon="pi pi-times"
-          class="p-button-sm p-button-outlined"
+          class="p-button-outlined p-button-secondary"
           (click)="clearFilters()"
         ></button>
       </div>
     </div>
   </div>
 
-  <!-- Products DataView -->
-  <p-dataView
-    #dv
-    [value]="products"
-    [paginator]="true"
-    [rows]="pageSize"
-    [totalRecords]="totalRecords"
-    [lazy]="true"
-    (onLazyLoad)="onPageChange($event)"
-    [loading]="loading"
-    layout="grid"
-  >
-    <!-- Header Template -->
-    <ng-template pTemplate="header">
-      <div class="dataview-header">
-        <span class="results-count">
-          {{ totalRecords }} Products Found
-        </span>
-      </div>
-    </ng-template>
+  <!-- Results Header -->
+  <div class="dataview-header">
+    <span class="results-count">
+      {{ products.length }} Products Found
+    </span>
+  </div>
 
-    <!-- Grid View Template -->
-    <ng-template let-product pTemplate="gridItem">
-      <div class="product-card">
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-container">
+      @for (item of [1,2,3,4,5,6,7,8]; track item) {
+        <div class="product-card">
+          <p-skeleton width="100%" height="200px"></p-skeleton>
+          <div class="p-mt-2">
+            <p-skeleton width="80%" height="1.5rem"></p-skeleton>
+            <p-skeleton width="60%" height="1rem" styleClass="p-mt-2"></p-skeleton>
+            <p-skeleton width="40%" height="1rem" styleClass="p-mt-2"></p-skeleton>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Products Grid -->
+  @if (!loading && products.length > 0) {
+    <div class="products-grid">
+      @for (product of products; track product.id) {
+        <div class="product-card">
         <div class="product-image-wrapper" (click)="viewProductDetail(product.id)">
           @if (product.imageUrl) {
-            <img [src]="product.imageUrl" [alt]="product.name" class="product-image" />
+            <img
+              [src]="product.imageUrl"
+              [alt]="product.name"
+              class="product-image"
+              (error)="onImageError($event)"
+            />
           } @else {
-            <div class="no-image">
-              <i class="pi pi-image"></i>
-              <span>No Image</span>
+            <div class="no-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); z-index: 1;">
+              <i class="pi pi-shopping-bag" style="font-size: 6rem; color: #adb5bd;"></i>
+              <span style="font-size: 1rem; color: #6c757d; font-weight: 500; margin-top: 1rem;">Image not available</span>
             </div>
           }
 
@@ -163,37 +182,24 @@
           </div>
         </div>
       </div>
-    </ng-template>
+      }
+    </div>
+  }
 
-    <!-- Loading Template -->
-    <ng-template pTemplate="loading">
-      <div class="loading-container">
-        <div class="product-card" *ngFor="let item of [1,2,3,4,5,6,7,8]">
-          <p-skeleton width="100%" height="200px"></p-skeleton>
-          <div class="p-mt-2">
-            <p-skeleton width="80%" height="1.5rem"></p-skeleton>
-            <p-skeleton width="60%" height="1rem" styleClass="p-mt-2"></p-skeleton>
-            <p-skeleton width="40%" height="1rem" styleClass="p-mt-2"></p-skeleton>
-          </div>
-        </div>
-      </div>
-    </ng-template>
-
-    <!-- Empty Template -->
-    <ng-template pTemplate="empty">
-      <div class="empty-state">
-        <i class="pi pi-inbox empty-icon"></i>
-        <h3>No Products Found</h3>
-        <p>Try adjusting your search or filters</p>
-        <button
-          pButton
-          type="button"
-          label="Clear All Filters"
-          icon="pi pi-refresh"
-          class="p-button-outlined"
-          (click)="clearFilters()"
-        ></button>
-      </div>
-    </ng-template>
-  </p-dataView>
+  <!-- Empty State -->
+  @if (!loading && products.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-inbox empty-icon"></i>
+      <h3>No Products Found</h3>
+      <p>Try adjusting your search or filters</p>
+      <button
+        pButton
+        type="button"
+        label="Clear All Filters"
+        icon="pi pi-refresh"
+        class="p-button-outlined"
+        (click)="clearFilters()"
+      ></button>
+    </div>
+  }
 </div>

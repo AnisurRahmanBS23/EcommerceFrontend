@@ -30,13 +30,17 @@ export const routes: Routes = [
   },
   {
     path: 'cart',
-    loadComponent: () => import('./features/cart/cart-view/cart-view').then(m => m.CartView),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'checkout',
-    loadComponent: () => import('./features/cart/checkout/checkout').then(m => m.Checkout),
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/cart/cart-view/cart-view').then(m => m.CartView)
+      },
+      {
+        path: 'checkout',
+        loadComponent: () => import('./features/cart/checkout/checkout').then(m => m.Checkout)
+      }
+    ]
   },
   {
     path: 'orders',
@@ -53,8 +57,20 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {
+        path: '',
+        loadComponent: () => import('./features/admin/dashboard/dashboard').then(m => m.AdminDashboard)
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/admin/dashboard/dashboard').then(m => m.AdminDashboard)
+      },
+      {
         path: 'products',
         loadComponent: () => import('./features/admin/product-management/product-management').then(m => m.ProductManagement)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./features/admin/order-management/order-management').then(m => m.OrderManagement)
       }
     ]
   },

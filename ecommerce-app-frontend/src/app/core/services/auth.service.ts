@@ -55,7 +55,7 @@ export class AuthService {
     localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
     this.isAuthenticated.set(false);
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/products']);
   }
 
   /**

@@ -250,4 +250,32 @@ export class Checkout implements OnInit, OnDestroy {
   viewOrders(): void {
     this.router.navigate(['/orders']);
   }
+
+  /**
+   * Handle image load error - show placeholder icon
+   */
+  onImageError(event: any): void {
+    const target = event.target as HTMLImageElement;
+    target.style.display = 'none';
+    const parent = target.parentElement;
+    if (parent && !parent.querySelector('.no-image')) {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'no-image';
+      placeholder.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      `;
+      placeholder.innerHTML = `
+        <i class="pi pi-shopping-bag" style="font-size: 2rem; color: #adb5bd; line-height: 1;"></i>
+      `;
+      parent.appendChild(placeholder);
+    }
+  }
 }

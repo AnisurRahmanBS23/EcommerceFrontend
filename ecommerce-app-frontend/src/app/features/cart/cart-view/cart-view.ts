@@ -235,4 +235,34 @@ export class CartView implements OnInit, OnDestroy {
   getItemTotal(item: CartItem): number {
     return item.price * item.quantity;
   }
+
+  /**
+   * Handle image load error - show placeholder icon
+   */
+  onImageError(event: any): void {
+    const target = event.target as HTMLImageElement;
+    target.style.display = 'none';
+    const parent = target.parentElement;
+    if (parent && !parent.querySelector('.no-image')) {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'no-image';
+      placeholder.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      `;
+      placeholder.innerHTML = `
+        <i class="pi pi-shopping-bag" style="font-size: 3rem; color: #adb5bd; line-height: 1;"></i>
+        <span style="font-size: 0.7rem; color: #6c757d; font-weight: 500; margin-top: 0.5rem;">No image</span>
+      `;
+      parent.appendChild(placeholder);
+    }
+  }
 }

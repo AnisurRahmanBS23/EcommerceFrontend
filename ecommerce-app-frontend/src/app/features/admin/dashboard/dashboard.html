@@ -1,0 +1,34 @@
+<div class="admin-dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1><i class="pi pi-th-large"></i> Admin Dashboard</h1>
+    <p class="subtitle">Manage your e-commerce platform</p>
+  </div>
+
+  <!-- Dashboard Cards -->
+  <div class="dashboard-grid">
+    @for (card of dashboardCards; track card.route) {
+      <p-card class="dashboard-card" (click)="navigateTo(card.route)">
+        <ng-template pTemplate="header">
+          <div class="card-icon" [style.background-color]="card.color">
+            <i [class]="card.icon"></i>
+          </div>
+        </ng-template>
+
+        <h3>{{ card.title }}</h3>
+        <p>{{ card.description }}</p>
+
+        <ng-template pTemplate="footer">
+          <button
+            pButton
+            type="button"
+            label="Manage"
+            icon="pi pi-arrow-right"
+            class="p-button-text"
+            iconPos="right"
+          ></button>
+        </ng-template>
+      </p-card>
+    }
+  </div>
+</div>
