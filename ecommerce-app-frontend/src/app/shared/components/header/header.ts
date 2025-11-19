@@ -47,21 +47,39 @@ export class Header implements OnInit {
   }
 
   private updateUserMenu(): void {
-    this.userMenuItems = [
-      {
-        label: 'My Orders',
-        icon: 'pi pi-shopping-bag',
-        command: () => this.router.navigate(['/orders'])
-      },
-      {
+    const menuItems: MenuItem[] = [];
+
+    // Add Admin Panel menu item if user is admin
+    if (this.authService.isAdmin()) {
+      menuItems.push({
+        label: 'Admin Panel',
+        icon: 'pi pi-cog',
+        command: () => this.router.navigate(['/admin/dashboard'])
+      });
+      menuItems.push({
         separator: true
-      },
-      {
-        label: 'Logout',
-        icon: 'pi pi-sign-out',
-        command: () => this.logout()
-      }
-    ];
+      });
+    }
+
+    // Add My Orders for all authenticated users
+    menuItems.push({
+      label: 'My Orders',
+      icon: 'pi pi-shopping-bag',
+      command: () => this.router.navigate(['/orders'])
+    });
+
+    menuItems.push({
+      separator: true
+    });
+
+    // Add Logout
+    menuItems.push({
+      label: 'Logout',
+      icon: 'pi pi-sign-out',
+      command: () => this.logout()
+    });
+
+    this.userMenuItems = menuItems;
   }
 
   logout(): void {

@@ -1,0 +1,190 @@
+<div class="user-management">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="page-header">
+    <h1>User Management</h1>
+    <p class="subtitle">Manage users and their roles</p>
+  </div>
+
+  <div class="card">
+    <p-table
+      [value]="users"
+      [loading]="loading"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+      styleClass="p-datatable-sm"
+      responsiveLayout="scroll">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="username">
+            Username
+            <p-sortIcon field="username"></p-sortIcon>
+          </th>
+          <th pSortableColumn="email">
+            Email
+            <p-sortIcon field="email"></p-sortIcon>
+          </th>
+          <th>Roles</th>
+          <th pSortableColumn="isActive">
+            Status
+            <p-sortIcon field="isActive"></p-sortIcon>
+          </th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>
+            <strong>{{ user.username }}</strong>
+          </td>
+          <td>{{ user.email }}</td>
+          <td>
+            <div class="roles-container">
+              <p-tag
+                *ngFor="let role of user.roles"
+                [value]="role.name"
+                [severity]="getRoleSeverity(role.name)"
+                [rounded]="true"
+                styleClass="mr-1">
+              </p-tag>
+              <button
+                pButton
+                icon="pi pi-plus"
+                class="p-button-rounded p-button-text p-button-sm"
+                pTooltip="Assign Role"
+                tooltipPosition="top"
+                (click)="openAssignRoleDialog(user)">
+              </button>
+            </div>
+          </td>
+          <td>
+            <p-tag
+              *ngIf="user.isActive"
+              value="Active"
+              severity="success"
+              [rounded]="true">
+            </p-tag>
+            <p-tag
+              *ngIf="!user.isActive"
+              value="Inactive"
+              severity="danger"
+              [rounded]="true">
+            </p-tag>
+          </td>
+          <td>{{ user.createdAt | date: 'short' }}</td>
+          <td>
+            <div class="action-buttons">
+              <button
+                pButton
+                [icon]="user.isActive ? 'pi pi-ban' : 'pi pi-check'"
+                [label]="user.isActive ? 'Deactivate' : 'Activate'"
+                [class]="user.isActive ? 'p-button-warning' : 'p-button-success'"
+                class="p-button-sm p-button-text"
+                (click)="toggleUserStatus(user)">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-users" style="font-size: 3rem; color: var(--surface-400);"></i>
+              <p>No users found</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Assign Role Dialog -->
+  <p-dialog
+    header="Assign Role"
+    [(visible)]="displayAssignRoleDialog"
+    [modal]="true"
+    [style]="{ width: '450px' }"
+    [draggable]="false"
+    [resizable]="false">
+
+    <div class="dialog-content" *ngIf="selectedUser">
+      <p class="mb-3">
+        Assign a role to <strong>{{ selectedUser.username }}</strong>
+      </p>
+
+      <div class="field">
+        <label for="role">Select Role</label>
+        <p-select
+          id="role"
+          [(ngModel)]="selectedRole"
+          [options]="getAvailableRoles(selectedUser)"
+          optionLabel="name"
+          placeholder="Select a role"
+          [style]="{ width: '100%' }"
+          [filter]="true"
+          filterBy="name">
+          <ng-template pTemplate="item" let-role>
+            <div class="role-item">
+              <p-tag
+                [value]="role.name"
+                [severity]="getRoleSeverity(role.name)"
+                [rounded]="true"
+                class="mr-2">
+              </p-tag>
+              <span>{{ role.description }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="current-roles mt-3">
+        <label>Current Roles:</label>
+        <div class="roles-list mt-2">
+          <div *ngFor="let role of selectedUser.roles" class="role-chip">
+            <p-tag
+              [value]="role.name"
+              [severity]="getRoleSeverity(role.name)"
+              [rounded]="true">
+            </p-tag>
+            <button
+              pButton
+              icon="pi pi-times"
+              class="p-button-rounded p-button-text p-button-sm p-button-danger"
+              pTooltip="Remove Role"
+              (click)="removeRole(selectedUser, role)">
+            </button>
+          </div>
+          <div *ngIf="selectedUser.roles.length === 0" class="text-muted">
+            No roles assigned
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayAssignRoleDialog = false">
+      </button>
+      <button
+        pButton
+        label="Assign Role"
+        icon="pi pi-check"
+        [disabled]="!selectedRole"
+        (click)="assignRole()">
+      </button>
+    </ng-template>
+  </p-dialog>
+</div>

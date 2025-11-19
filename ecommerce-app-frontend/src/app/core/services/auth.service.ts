@@ -80,17 +80,55 @@ export class AuthService {
   }
 
   /**
+   * Check if current user has a specific role
+   */
+  hasRole(roleName: string): boolean {
+    const user = this.getCurrentUser();
+    return user?.roles?.includes(roleName) ?? false;
+  }
+
+  /**
+   * Check if current user is an Admin
+   */
+  isAdmin(): boolean {
+    return this.hasRole('Admin');
+  }
+
+  /**
+   * Check if current user is a Manager
+   */
+  isManager(): boolean {
+    return this.hasRole('Manager');
+  }
+
+  /**
+   * Check if current user is a Customer
+   */
+  isCustomer(): boolean {
+    return this.hasRole('Customer');
+  }
+
+  /**
+   * Get user roles
+   */
+  getUserRoles(): string[] {
+    const user = this.getCurrentUser();
+    return user?.roles ?? [];
+  }
+
+  /**
    * Handle successful authentication
    */
   private handleAuthSuccess(response: AuthResponse): void {
     // Store token
     localStorage.setItem(this.TOKEN_KEY, response.token);
 
-    // Store user info
+    // Store user info with roles
     const user: User = {
       userId: response.userId,
       username: response.username,
-      email: response.email
+      email: response.email,
+      roles: response.roles || [] // Store roles from response
     };
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
 

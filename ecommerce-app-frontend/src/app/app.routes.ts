@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -54,7 +55,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [authGuard],
+    canActivate: [adminGuard], // Changed to adminGuard for role-based access
     children: [
       {
         path: '',
@@ -71,6 +72,10 @@ export const routes: Routes = [
       {
         path: 'orders',
         loadComponent: () => import('./features/admin/order-management/order-management').then(m => m.OrderManagement)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/admin/user-management/user-management').then(m => m.UserManagement)
       }
     ]
   },

@@ -1,0 +1,116 @@
+.user-management {
+  padding: 2rem;
+
+  .page-header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .subtitle {
+      color: var(--text-color-secondary);
+      font-size: 1rem;
+    }
+  }
+
+  .card {
+    background: var(--surface-card);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .roles-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .empty-state {
+    padding: 3rem;
+    text-align: center;
+
+    p {
+      margin-top: 1rem;
+      color: var(--text-color-secondary);
+      font-size: 1.1rem;
+    }
+  }
+
+  .dialog-content {
+    .field {
+      margin-bottom: 1rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-color);
+      }
+    }
+
+    .current-roles {
+      label {
+        display: block;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+      }
+
+      .roles-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .role-chip {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem;
+          background: var(--surface-100);
+          border-radius: 6px;
+        }
+
+        .text-muted {
+          color: var(--text-color-secondary);
+          font-style: italic;
+        }
+      }
+    }
+
+    .role-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .user-management {
+    padding: 1rem;
+
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .card {
+      padding: 1rem;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+}

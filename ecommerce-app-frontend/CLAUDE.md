@@ -1,4 +1,6 @@
 # E-Commerce Frontend Application
+C:\PROJECT-DOCS\API_SPEC.md
+Always check for new or updated endpoints or models and generate code accordingly.
 
 ## Project Overview
 Angular 18 single-page application (SPA) for an e-commerce platform with PrimeNG UI components, JWT authentication, and integration with .NET Core microservices backend.
