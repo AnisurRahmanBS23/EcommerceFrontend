@@ -1,17 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { Select } from 'primeng/select';
+import { MultiSelect } from 'primeng/multiselect';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { UserManagementService } from '../../../core/services/user-management.service';
-import { UserWithRoles, Role, AssignRoleRequest } from '../../../core/models/auth.model';
+import { UserWithRoles, Role, AssignRoleRequest, CreateUserRequest } from '../../../core/models/auth.model';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -25,6 +27,7 @@ import { FormsModule } from '@angular/forms';
     TagModule,
     DialogModule,
     Select,
+    MultiSelect,
     ToastModule,
     ConfirmDialogModule,
     TooltipModule
@@ -41,12 +44,23 @@ export class UserManagement implements OnInit, OnDestroy {
   selectedUser: UserWithRoles | null = null;
   selectedRole: Role | null = null;
 
+  // Create User Dialog
+  displayCreateUserDialog = false;
+  newUser: CreateUserRequest = {
+    username: '',
+    email: '',
+    password: '',
+    roleIds: []
+  };
+  selectedRolesForNewUser: Role[] = [];
+
   private destroy$ = new Subject<void>();
 
   constructor(
     private userManagementService: UserManagementService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -244,5 +258,79 @@ export class UserManagement implements OnInit, OnDestroy {
   getAvailableRoles(user: UserWithRoles): Role[] {
     const userRoleIds = user.roles.map(r => r.id);
     return this.allRoles.filter(role => !userRoleIds.includes(role.id));
+  }
+
+  /**
+   * Open create user dialog
+   */
+  openCreateUserDialog(): void {
+    this.newUser = {
+      username: '',
+      email: '',
+      password: '',
+      roleIds: []
+    };
+    this.selectedRolesForNewUser = [];
+    this.displayCreateUserDialog = true;
+  }
+
+  /**
+   * Create new user
+   */
+  createUser(): void {
+    // Validate form
+    if (!this.newUser.username || !this.newUser.email || !this.newUser.password) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: 'Please fill in all required fields'
+      });
+      return;
+    }
+
+    if (this.selectedRolesForNewUser.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: 'Please select at least one role'
+      });
+      return;
+    }
+
+    // Map selected roles to role IDs
+    this.newUser.roleIds = this.selectedRolesForNewUser.map(role => role.id);
+
+    // Call API
+    this.userManagementService.createUser(this.newUser)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (createdUser) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: `User '${createdUser.username}' created successfully`
+          });
+          this.displayCreateUserDialog = false;
+          this.loadUsers(); // Reload users list
+        },
+        error: (error) => {
+          console.error('Error creating user:', error);
+          const errorMessage = error.error?.message || error.error?.errors
+            ? Object.values(error.error.errors).flat().join(', ')
+            : 'Failed to create user';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: errorMessage
+          });
+        }
+      });
+  }
+
+  /**
+   * Navigate back to dashboard
+   */
+  goBack(): void {
+    this.router.navigate(['/admin/dashboard']);
   }
 }

@@ -5,7 +5,7 @@ import { adminGuard } from './core/guards/admin.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/products',
+    loadComponent: () => import('./core/components/root-redirect').then(m => m.RootRedirect),
     pathMatch: 'full'
   },
   {

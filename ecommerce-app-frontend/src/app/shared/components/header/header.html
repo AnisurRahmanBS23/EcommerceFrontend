@@ -8,17 +8,53 @@
         E-Shop
       </a>
 
-      <p-button
-        label="Products"
-        icon="pi pi-list"
-        [text]="true"
-        (onClick)="navigateToProducts()">
-      </p-button>
+      <!-- Mode Indicator Badge (visible for admins) -->
+      @if (canSwitchMode() && isAuthenticated()) {
+        <p-tag
+          [value]="getModeBadgeLabel()"
+          [severity]="getModeBadgeSeverity()"
+          [icon]="currentMode === 'admin' ? 'pi pi-shield' : 'pi pi-user'"
+          styleClass="mode-badge">
+        </p-tag>
+      }
+
+      <!-- Navigation based on current mode -->
+      @if (currentMode === 'customer') {
+        <p-button
+          label="Products"
+          icon="pi pi-list"
+          [text]="true"
+          (onClick)="navigateToProducts()">
+        </p-button>
+      } @else {
+        <p-button
+          label="Dashboard"
+          icon="pi pi-home"
+          [text]="true"
+          (onClick)="router.navigate(['/admin/dashboard'])">
+        </p-button>
+      }
     </div>
   </ng-template>
 
   <ng-template pTemplate="right">
     <div class="flex align-items-center gap-2">
+      <!-- Mode Switcher (for admins/managers only) -->
+      @if (canSwitchMode() && isAuthenticated()) {
+        <p-selectButton
+          [(ngModel)]="currentMode"
+          [options]="modeOptions"
+          (onChange)="onModeChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="mode-switcher">
+          <ng-template let-item pTemplate>
+            <i [class]="item.icon"></i>
+            <span class="ml-2">{{ item.label }}</span>
+          </ng-template>
+        </p-selectButton>
+      }
+
       <!-- Cart Button -->
       <p-button
         icon="pi pi-shopping-cart"

@@ -33,6 +33,13 @@ export class AdminDashboard {
       icon: 'pi pi-shopping-bag',
       route: '/admin/orders',
       color: '#10b981'
+    },
+    {
+      title: 'User Management',
+      description: 'Manage users, roles, and permissions. Create and activate user accounts.',
+      icon: 'pi pi-users',
+      route: '/admin/users',
+      color: '#8b5cf6'
     }
   ];
 

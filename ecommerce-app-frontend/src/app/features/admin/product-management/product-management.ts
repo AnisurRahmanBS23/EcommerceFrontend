@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 // PrimeNG Imports
@@ -55,7 +56,8 @@ export class ProductManagement implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private productService: ProductService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -275,5 +277,12 @@ export class ProductManagement implements OnInit, OnDestroy {
     if (stock > 10) return 'In Stock';
     if (stock > 0) return 'Low Stock';
     return 'Out of Stock';
+  }
+
+  /**
+   * Navigate back to dashboard
+   */
+  goBack(): void {
+    this.router.navigate(['/admin/dashboard']);
   }
 }

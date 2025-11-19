@@ -3,8 +3,25 @@
 
   <!-- Header -->
   <div class="page-header">
-    <h1><i class="pi pi-shopping-bag"></i> Order Management</h1>
-    <p class="subtitle">View and manage all customer orders</p>
+    <div class="header-top">
+      <button
+        pButton
+        icon="pi pi-arrow-left"
+        class="p-button-text p-button-plain back-button"
+        pTooltip="Back to Dashboard"
+        tooltipPosition="right"
+        (click)="goBack()"
+      ></button>
+      <div class="header-content">
+        <h1><i class="pi pi-shopping-bag"></i> Order Management</h1>
+        <p class="subtitle">View and manage all customer orders</p>
+      </div>
+      <div class="header-actions">
+        <span class="total-orders">
+          Total: {{ filteredOrders.length }} order(s)
+        </span>
+      </div>
+    </div>
   </div>
 
   <!-- Toolbar with Filters -->
@@ -22,12 +39,6 @@
           [style]="{'min-width': '200px'}"
         ></p-select>
       </div>
-    </ng-template>
-
-    <ng-template pTemplate="right">
-      <span class="total-orders">
-        Total: {{ filteredOrders.length }} order(s)
-      </span>
     </ng-template>
   </p-toolbar>
 

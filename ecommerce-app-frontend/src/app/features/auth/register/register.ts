@@ -72,12 +72,13 @@ export class Register {
     this.authService.register(this.registerRequest).subscribe({
       next: (response) => {
         this.loading = false;
-        this.successMessage = 'Registration successful! Redirecting to products...';
+        this.successMessage = 'Registration successful! Redirecting...';
         console.log('Registration successful', response);
 
-        // Redirect to products page after short delay
+        // Redirect based on user role after short delay
         setTimeout(() => {
-          this.router.navigate(['/products']);
+          const redirectTo = this.authService.getDefaultRoute();
+          this.router.navigate([redirectTo]);
         }, 1500);
       },
       error: (error) => {

@@ -117,6 +117,16 @@ export class AuthService {
   }
 
   /**
+   * Get default route based on user role
+   */
+  getDefaultRoute(): string {
+    if (this.isAdmin() || this.isManager()) {
+      return '/admin/dashboard';
+    }
+    return '/products';
+  }
+
+  /**
    * Handle successful authentication
    */
   private handleAuthSuccess(response: AuthResponse): void {

@@ -1,28 +1,67 @@
 .order-management-container {
-  padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+  padding: 2rem;
+  min-height: 70vh;
 }
 
 .page-header {
-  text-align: center;
   margin-bottom: 2rem;
 
-  h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--surface-card);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-    i {
-      margin-right: 1rem;
+  .back-button {
+    font-size: 1.5rem;
+    color: var(--text-color-secondary);
+
+    &:hover {
       color: var(--primary-color);
     }
   }
 
-  .subtitle {
-    font-size: 1.1rem;
-    color: var(--text-color-secondary);
+  .header-content {
+    flex: 1;
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      i {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+      }
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-color-secondary);
+      margin: 0;
+    }
+  }
+
+  .header-actions {
+    .total-orders {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      padding: 0.5rem 1rem;
+      background: var(--primary-color-text);
+      border-radius: 6px;
+    }
   }
 }
 

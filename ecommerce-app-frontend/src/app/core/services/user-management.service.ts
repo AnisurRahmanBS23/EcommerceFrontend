@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { UserWithRoles, Role, AssignRoleRequest } from '../models/auth.model';
+import { UserWithRoles, Role, AssignRoleRequest, CreateUserRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +31,13 @@ export class UserManagementService {
    */
   getAllRoles(): Observable<Role[]> {
     return this.http.get<Role[]>(`${this.baseUrl}/roles`);
+  }
+
+  /**
+   * Create new user with roles (Admin only)
+   */
+  createUser(request: CreateUserRequest): Observable<UserWithRoles> {
+    return this.http.post<UserWithRoles>(`${this.baseUrl}/users`, request);
   }
 
   /**

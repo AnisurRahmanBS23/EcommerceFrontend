@@ -25,9 +25,6 @@ export class ProductService {
   getProducts(queryParams?: ProductQueryParams): Observable<PaginatedResponse<Product>> {
     let params = new HttpParams();
 
-    const page = queryParams?.page || 1;
-    const pageSize = queryParams?.pageSize || 12;
-
     if (queryParams) {
       if (queryParams.page) {
         params = params.set('page', queryParams.page.toString());
@@ -55,23 +52,8 @@ export class ProductService {
       }
     }
 
-    // API returns array, we need to transform it to PaginatedResponse
-    return this.http.get<Product[]>(this.apiUrl, { params }).pipe(
-      map(products => {
-        const totalCount = products.length;
-        const totalPages = Math.ceil(totalCount / pageSize);
-
-        return {
-          items: products,
-          page: page,
-          pageSize: pageSize,
-          totalCount: totalCount,
-          totalPages: totalPages,
-          hasPreviousPage: page > 1,
-          hasNextPage: page < totalPages
-        };
-      })
-    );
+    // Call the /search endpoint which supports filtering and pagination
+    return this.http.get<PaginatedResponse<Product>>(`${this.apiUrl}/search`, { params });
   }
 
   /**

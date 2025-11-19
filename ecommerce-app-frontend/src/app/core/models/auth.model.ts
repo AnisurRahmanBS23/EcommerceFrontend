@@ -48,3 +48,10 @@ export interface UserWithRoles {
 export interface AssignRoleRequest {
   roleId: string;
 }
+
+export interface CreateUserRequest {
+  username: string;
+  email: string;
+  password: string;
+  roleIds: string[];
+}

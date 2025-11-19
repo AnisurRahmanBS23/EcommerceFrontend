@@ -49,4 +49,35 @@
   .mr-2 {
     margin-right: 0.5rem;
   }
+
+  .ml-2 {
+    margin-left: 0.5rem;
+  }
+
+  // Mode Badge Styling
+  .mode-badge {
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+  }
+
+  // Mode Switcher Styling
+  .mode-switcher {
+    .p-selectbutton {
+      .p-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+
+        i {
+          font-size: 1rem;
+        }
+
+        &.p-highlight {
+          background: var(--primary-color);
+          border-color: var(--primary-color);
+          color: var(--primary-color-text);
+        }
+      }
+    }
+  }
 }

@@ -3,23 +3,32 @@
   <p-confirmDialog></p-confirmDialog>
 
   <!-- Header -->
-  <div class="management-header">
-    <h1><i class="pi pi-box"></i> Product Management</h1>
-    <p class="subtitle">Manage your product catalog</p>
-  </div>
-
-  <!-- Toolbar -->
-  <p-toolbar>
-    <ng-template pTemplate="left">
+  <div class="page-header">
+    <div class="header-top">
       <button
         pButton
-        type="button"
+        icon="pi pi-arrow-left"
+        class="p-button-text p-button-plain back-button"
+        pTooltip="Back to Dashboard"
+        tooltipPosition="right"
+        (click)="goBack()"
+      ></button>
+      <div class="header-content">
+        <h1><i class="pi pi-box"></i> Product Management</h1>
+        <p class="subtitle">Manage your product catalog</p>
+      </div>
+      <button
+        pButton
         label="New Product"
         icon="pi pi-plus"
         class="p-button-success"
         (click)="openNewProductDialog()"
       ></button>
-    </ng-template>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <p-toolbar>
     <ng-template pTemplate="right">
       <button
         pButton

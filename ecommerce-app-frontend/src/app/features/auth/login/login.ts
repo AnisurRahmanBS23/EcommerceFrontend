@@ -34,15 +34,15 @@ export class Login {
 
   loading = false;
   errorMessage = '';
-  returnUrl = '/products';
+  returnUrl?: string;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
   ) {
-    // Get return url from route parameters or default to '/products'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
+    // Get return url from route parameters (if user was redirected to login)
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'];
   }
 
   onLogin(): void {
@@ -58,7 +58,10 @@ export class Login {
       next: (response) => {
         this.loading = false;
         console.log('Login successful', response);
-        this.router.navigate([this.returnUrl]);
+
+        // Use returnUrl if exists, otherwise redirect based on user role
+        const redirectTo = this.returnUrl || this.authService.getDefaultRoute();
+        this.router.navigate([redirectTo]);
       },
       error: (error) => {
         this.loading = false;

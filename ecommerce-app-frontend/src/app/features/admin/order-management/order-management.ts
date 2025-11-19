@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 // PrimeNG Imports
@@ -15,6 +16,7 @@ import { Select } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
+import { TooltipModule } from 'primeng/tooltip';
 
 // Services & Models
 import { OrderService } from '../../../core/services/order.service';
@@ -35,7 +37,8 @@ import { Order } from '../../../core/models/order.model';
     Select,
     InputTextModule,
     CardModule,
-    DividerModule
+    DividerModule,
+    TooltipModule
   ],
   providers: [MessageService],
   templateUrl: './order-management.html',
@@ -71,7 +74,8 @@ export class OrderManagement implements OnInit, OnDestroy {
 
   constructor(
     private orderService: OrderService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -205,5 +209,12 @@ export class OrderManagement implements OnInit, OnDestroy {
    */
   getItemTotal(item: any): number {
     return item.price * item.quantity;
+  }
+
+  /**
+   * Navigate back to dashboard
+   */
+  goBack(): void {
+    this.router.navigate(['/admin/dashboard']);
   }
 }
