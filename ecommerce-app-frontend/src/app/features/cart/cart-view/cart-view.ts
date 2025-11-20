@@ -85,12 +85,16 @@ export class CartView implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error loading cart:', error);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load cart. Using local cart.'
-          });
+          // If cart not found (404), it's okay - user just has an empty cart
+          // Only show error for other status codes
+          if (!error.message?.includes('not found') && !error.message?.includes('404')) {
+            console.error('Error loading cart:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to load cart. Using local cart.'
+            });
+          }
           this.loading = false;
         }
       });

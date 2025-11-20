@@ -2,33 +2,241 @@
   <!-- Header -->
   <div class="dashboard-header">
     <h1><i class="pi pi-th-large"></i> Admin Dashboard</h1>
-    <p class="subtitle">Manage your e-commerce platform</p>
+    <p class="subtitle">Overview of your e-commerce platform</p>
   </div>
 
-  <!-- Dashboard Cards -->
-  <div class="dashboard-grid">
-    @for (card of dashboardCards; track card.route) {
-      <p-card class="dashboard-card" (click)="navigateTo(card.route)">
+  <!-- Quick Actions -->
+  <div class="quick-actions-section">
+    <h2 class="section-title"><i class="pi pi-bolt"></i> Quick Actions</h2>
+    <div class="quick-actions-grid">
+      @for (action of quickActions; track action.route) {
+        <p-card class="action-card" (click)="navigateTo(action.route)">
+          <div class="action-card-content">
+            <div class="action-icon" [style.background-color]="action.color">
+              <i [class]="action.icon"></i>
+            </div>
+            <div class="action-details">
+              <h3>{{ action.title }}</h3>
+              <p>{{ action.description }}</p>
+            </div>
+            <i class="pi pi-arrow-right action-arrow"></i>
+          </div>
+        </p-card>
+      }
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-grid">
+    @if (loading.stats) {
+      <p-card *ngFor="let i of [1,2,3,4,5]" class="stat-card">
+        <p-skeleton width="100%" height="80px"></p-skeleton>
+      </p-card>
+    } @else if (stats) {
+      <p-card class="stat-card stat-primary">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="pi pi-dollar"></i>
+          </div>
+          <div class="stat-details">
+            <span class="stat-label">Total Revenue</span>
+            <h2 class="stat-value">{{ formatCurrency(stats.totalRevenue) }}</h2>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card class="stat-card stat-success">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="pi pi-shopping-cart"></i>
+          </div>
+          <div class="stat-details">
+            <span class="stat-label">Total Orders</span>
+            <h2 class="stat-value">{{ stats.totalOrders }}</h2>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card class="stat-card stat-info">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="pi pi-calendar"></i>
+          </div>
+          <div class="stat-details">
+            <span class="stat-label">Revenue This Month</span>
+            <h2 class="stat-value">{{ formatCurrency(stats.revenueThisMonth) }}</h2>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card class="stat-card stat-warning">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="pi pi-chart-line"></i>
+          </div>
+          <div class="stat-details">
+            <span class="stat-label">Orders This Month</span>
+            <h2 class="stat-value">{{ stats.ordersThisMonth }}</h2>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card class="stat-card stat-secondary">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <i class="pi pi-money-bill"></i>
+          </div>
+          <div class="stat-details">
+            <span class="stat-label">Avg Order Value</span>
+            <h2 class="stat-value">{{ formatCurrency(stats.averageOrderValue) }}</h2>
+          </div>
+        </div>
+      </p-card>
+    }
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Recent Orders -->
+    <div class="section recent-orders-section">
+      <p-card>
         <ng-template pTemplate="header">
-          <div class="card-icon" [style.background-color]="card.color">
-            <i [class]="card.icon"></i>
+          <div class="section-header">
+            <h3><i class="pi pi-list"></i> Recent Orders</h3>
+            <button
+              pButton
+              type="button"
+              label="View All"
+              class="p-button-text p-button-sm"
+              (click)="navigateTo('/admin/orders')"
+            ></button>
           </div>
         </ng-template>
 
-        <h3>{{ card.title }}</h3>
-        <p>{{ card.description }}</p>
-
-        <ng-template pTemplate="footer">
-          <button
-            pButton
-            type="button"
-            label="Manage"
-            icon="pi pi-arrow-right"
-            class="p-button-text"
-            iconPos="right"
-          ></button>
-        </ng-template>
+        @if (loading.recentOrders) {
+          <p-skeleton width="100%" height="300px"></p-skeleton>
+        } @else if (recentOrders.length > 0) {
+          <p-table [value]="recentOrders" [tableStyle]="{'min-width': '50rem'}">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-order>
+              <tr>
+                <td>{{ order.id.substring(0, 8) }}...</td>
+                <td>
+                  <div class="customer-info">
+                    <strong>{{ order.customerName }}</strong>
+                    <small>{{ order.customerEmail }}</small>
+                  </div>
+                </td>
+                <td>{{ formatCurrency(order.totalAmount) }}</td>
+                <td>
+                  <p-tag
+                    [value]="order.status"
+                    [severity]="getOrderStatusSeverity(order.status)"
+                  ></p-tag>
+                </td>
+                <td>{{ formatDate(order.createdAt) }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        } @else {
+          <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>No recent orders</p>
+          </div>
+        }
       </p-card>
-    }
+    </div>
+
+    <!-- Top Products -->
+    <div class="section top-products-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="section-header">
+            <h3><i class="pi pi-star"></i> Top Selling Products</h3>
+          </div>
+        </ng-template>
+
+        @if (loading.topProducts) {
+          <p-skeleton width="100%" height="250px"></p-skeleton>
+        } @else if (topProducts.length > 0) {
+          <div class="product-list">
+            @for (product of topProducts; track product.productId) {
+              <div class="product-item">
+                <div class="product-info">
+                  <span class="product-name">{{ product.productName }}</span>
+                  <span class="product-sold">{{ product.quantitySold }} units sold</span>
+                </div>
+                <div class="product-revenue">
+                  {{ formatCurrency(product.revenue) }}
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>No product sales yet</p>
+          </div>
+        }
+      </p-card>
+    </div>
+
+    <!-- Low Stock Products -->
+    <div class="section low-stock-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="section-header">
+            <h3><i class="pi pi-exclamation-triangle"></i> Low Stock Alerts</h3>
+            <button
+              pButton
+              type="button"
+              label="Manage Products"
+              class="p-button-text p-button-sm"
+              (click)="navigateTo('/admin/products')"
+            ></button>
+          </div>
+        </ng-template>
+
+        @if (loading.lowStockProducts) {
+          <p-skeleton width="100%" height="250px"></p-skeleton>
+        } @else if (lowStockProducts.length > 0) {
+          <p-dataView [value]="lowStockProducts" layout="list">
+            <ng-template let-product pTemplate="listItem">
+              <div class="low-stock-item">
+                <img
+                  [src]="product.imageUrl"
+                  [alt]="product.name"
+                  class="product-image"
+                  onerror="this.src='https://via.placeholder.com/60'"
+                />
+                <div class="product-details">
+                  <h4>{{ product.name }}</h4>
+                  <p class="product-price">{{ formatCurrency(product.price) }}</p>
+                </div>
+                <div class="stock-badge">
+                  <p-tag
+                    [value]="'Only ' + product.stock + ' left'"
+                    severity="danger"
+                  ></p-tag>
+                </div>
+              </div>
+            </ng-template>
+          </p-dataView>
+        } @else {
+          <div class="empty-state">
+            <i class="pi pi-check-circle"></i>
+            <p>All products are well stocked!</p>
+          </div>
+        }
+      </p-card>
+    </div>
   </div>
 </div>

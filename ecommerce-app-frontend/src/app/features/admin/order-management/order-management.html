@@ -18,7 +18,7 @@
       </div>
       <div class="header-actions">
         <span class="total-orders">
-          Total: {{ filteredOrders.length }} order(s)
+          Total: {{ orders.length }} order(s)
         </span>
       </div>
     </div>
@@ -28,130 +28,184 @@
   <p-toolbar>
     <ng-template pTemplate="left">
       <div class="filter-section">
-        <label for="status-filter">Filter by Status:</label>
+        <span class="p-input-icon-left search-input">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search by order ID, customer name or email"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+            [style]="{'width': '350px'}"
+          />
+        </span>
         <p-select
-          inputId="status-filter"
           [options]="statusOptions"
           [(ngModel)]="statusFilter"
           optionLabel="label"
           optionValue="value"
-          (onChange)="applyFilter()"
-          [style]="{'min-width': '200px'}"
+          placeholder="Filter by Status"
+          (onChange)="onFilterChange()"
+          [style]="{'min-width': '180px'}"
         ></p-select>
       </div>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <button
+        pButton
+        type="button"
+        label="Search"
+        icon="pi pi-search"
+        class="p-button-sm"
+        (click)="onSearch()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Clear"
+        icon="pi pi-filter-slash"
+        class="p-button-sm p-button-outlined"
+        (click)="clearFilters()"
+      ></button>
     </ng-template>
   </p-toolbar>
 
   <!-- Orders Table -->
   <p-card>
-    <p-table
-      [value]="filteredOrders"
-      [paginator]="true"
-      [rows]="10"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} orders"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      [loading]="loading"
-      styleClass="p-datatable-orders"
-    >
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Order ID</th>
-          <th>Customer</th>
-          <th>Date</th>
-          <th>Items</th>
-          <th>Total Amount</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </ng-template>
+    @if (loading) {
+      <p-skeleton width="100%" height="400px"></p-skeleton>
+    } @else {
+      <p-table
+        [value]="orders"
+        [paginator]="true"
+        [rows]="20"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} orders"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        styleClass="p-datatable-orders"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
 
-      <ng-template pTemplate="body" let-order>
-        <tr>
-          <td>
-            <span class="order-id">#{{ order.id.slice(0, 8) }}</span>
-          </td>
-          <td>
-            <div class="customer-info">
-              <span class="customer-name">{{ order.userId.slice(0, 8) }}</span>
-              <small class="customer-email">User ID</small>
-            </div>
-          </td>
-          <td>
-            <span class="order-date">{{ order.createdAt | date:'medium' }}</span>
-          </td>
-          <td>
-            <span class="order-items">{{ getTotalItems(order) }}</span>
-          </td>
-          <td>
-            <span class="order-total">${{ order.totalAmount | number:'1.2-2' }}</span>
-          </td>
-          <td>
-            <p-tag
-              [value]="getStatusLabel(order.status)"
-              [severity]="getStatusSeverity(order.status)"
-            ></p-tag>
-          </td>
-          <td>
-            <button
-              pButton
-              type="button"
-              label="View Details"
-              icon="pi pi-eye"
-              class="p-button-sm p-button-outlined"
-              (click)="viewOrderDetails(order)"
-            ></button>
-          </td>
-        </tr>
-      </ng-template>
+        <ng-template pTemplate="body" let-order>
+          <tr>
+            <td>
+              <span class="order-id">{{ order.id.substring(0, 8) }}...</span>
+            </td>
+            <td>
+              <div class="customer-info">
+                <strong>{{ order.customerName || 'N/A' }}</strong>
+                <small>{{ order.customerEmail || 'N/A' }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+            </td>
+            <td>
+              <span class="order-items">{{ getTotalItems(order) }}</span>
+            </td>
+            <td>
+              <span class="order-total">{{ formatCurrency(order.totalAmount) }}</span>
+            </td>
+            <td>
+              <p-tag
+                [value]="order.status"
+                [severity]="getStatusSeverity(order.status)"
+              ></p-tag>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-eye"
+                  class="p-button-sm p-button-text"
+                  pTooltip="View Details"
+                  (click)="viewOrderDetails(order)"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-pencil"
+                  class="p-button-sm p-button-text"
+                  pTooltip="Update Status"
+                  (click)="openStatusDialog(order)"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-comment"
+                  class="p-button-sm p-button-text"
+                  pTooltip="Order Notes"
+                  (click)="openNotesDialog(order)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="7" class="text-center">
-            <div class="empty-message">
-              <i class="pi pi-inbox empty-icon"></i>
-              <p>No orders found</p>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center">
+              <div class="empty-message">
+                <i class="pi pi-inbox empty-icon"></i>
+                <p>No orders found</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
   </p-card>
 
   <!-- Order Details Dialog -->
   <p-dialog
     [(visible)]="displayOrderDialog"
     [modal]="true"
-    [style]="{width: '800px'}"
+    [style]="{width: '900px', maxHeight: '90vh'}"
     [draggable]="false"
     [resizable]="false"
+    header="Order Details"
   >
-    <ng-template pTemplate="header">
-      <h3>Order Details - #{{ selectedOrder?.id?.slice(0, 8) }}</h3>
-    </ng-template>
-
     @if (selectedOrder) {
       <div class="order-details">
-        <!-- Order Info -->
+        <!-- Order Info Grid -->
         <div class="order-info-grid">
           <div class="info-item">
             <label>Order ID:</label>
-            <span>{{ selectedOrder.id }}</span>
+            <span class="info-value">{{ selectedOrder.id }}</span>
           </div>
           <div class="info-item">
             <label>Order Date:</label>
-            <span>{{ selectedOrder.createdAt | date:'medium' }}</span>
+            <span class="info-value">{{ formatDate(selectedOrder.createdAt) }}</span>
           </div>
           <div class="info-item">
-            <label>User ID:</label>
-            <span>{{ selectedOrder.userId }}</span>
+            <label>Customer Name:</label>
+            <span class="info-value">{{ selectedOrder.customerName || 'N/A' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Customer Email:</label>
+            <span class="info-value">{{ selectedOrder.customerEmail || 'N/A' }}</span>
           </div>
           <div class="info-item">
             <label>Status:</label>
             <p-tag
-              [value]="getStatusLabel(selectedOrder.status)"
+              [value]="selectedOrder.status"
               [severity]="getStatusSeverity(selectedOrder.status)"
             ></p-tag>
+          </div>
+          <div class="info-item">
+            <label>Total Amount:</label>
+            <span class="info-value amount">{{ formatCurrency(selectedOrder.totalAmount) }}</span>
           </div>
         </div>
 
@@ -173,10 +227,10 @@
               <div class="order-item">
                 <div class="item-info">
                   <span class="item-name">{{ item.productName }}</span>
-                  <span class="item-details">{{ item.quantity }} x ${{ item.price | number:'1.2-2' }}</span>
+                  <span class="item-details">{{ item.quantity }} × {{ formatCurrency(item.price) }}</span>
                 </div>
                 <div class="item-total">
-                  ${{ getItemTotal(item) | number:'1.2-2' }}
+                  {{ formatCurrency(getItemTotal(item)) }}
                 </div>
               </div>
             }
@@ -193,32 +247,7 @@
           </div>
           <div class="summary-row total">
             <span>Total Amount:</span>
-            <span>${{ selectedOrder.totalAmount | number:'1.2-2' }}</span>
-          </div>
-        </div>
-
-        <p-divider></p-divider>
-
-        <!-- Update Status -->
-        <div class="section">
-          <h4><i class="pi pi-refresh"></i> Update Order Status</h4>
-          <div class="status-update">
-            <p-select
-              [options]="updateStatusOptions"
-              [(ngModel)]="selectedOrder.status"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select new status"
-              [style]="{'width': '100%'}"
-            ></p-select>
-            <button
-              pButton
-              type="button"
-              label="Update Status"
-              icon="pi pi-check"
-              class="p-button-success"
-              (click)="updateOrderStatus(selectedOrder.id, selectedOrder.status)"
-            ></button>
+            <span>{{ formatCurrency(selectedOrder.totalAmount) }}</span>
           </div>
         </div>
       </div>
@@ -232,6 +261,145 @@
         icon="pi pi-times"
         class="p-button-text"
         (click)="displayOrderDialog = false"
+      ></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Update Status Dialog -->
+  <p-dialog
+    [(visible)]="displayStatusDialog"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [draggable]="false"
+    [resizable]="false"
+    header="Update Order Status"
+  >
+    @if (selectedOrder) {
+      <div class="status-update-content">
+        <p class="dialog-info">
+          Update status for Order <strong>{{ selectedOrder.id.substring(0, 8) }}...</strong>
+        </p>
+
+        <div class="form-field">
+          <label for="status">Current Status:</label>
+          <p-tag
+            [value]="selectedOrder.status"
+            [severity]="getStatusSeverity(selectedOrder.status)"
+          ></p-tag>
+        </div>
+
+        <div class="form-field">
+          <label for="new-status">New Status:</label>
+          <p-select
+            inputId="new-status"
+            [options]="statusOptions.slice(1)"
+            [(ngModel)]="newStatus"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select new status"
+            [style]="{'width': '100%'}"
+          ></p-select>
+        </div>
+      </div>
+    }
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayStatusDialog = false"
+        [disabled]="updatingStatus"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Update"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="updateOrderStatus()"
+        [loading]="updatingStatus"
+      ></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Order Notes Dialog -->
+  <p-dialog
+    [(visible)]="displayNotesDialog"
+    [modal]="true"
+    [style]="{width: '700px', maxHeight: '80vh'}"
+    [draggable]="false"
+    [resizable]="false"
+    header="Order Notes"
+  >
+    @if (selectedOrder) {
+      <div class="notes-content">
+        <p class="dialog-info">
+          Notes for Order <strong>{{ selectedOrder.id.substring(0, 8) }}...</strong>
+        </p>
+
+        <!-- Add Note Form -->
+        <div class="add-note-section">
+          <h4><i class="pi pi-plus-circle"></i> Add New Note</h4>
+          <textarea
+            pTextarea
+            [(ngModel)]="newNote"
+            placeholder="Enter your note here..."
+            [rows]="3"
+            [style]="{'width': '100%'}"
+          ></textarea>
+          <button
+            pButton
+            type="button"
+            label="Add Note"
+            icon="pi pi-plus"
+            class="p-button-sm"
+            (click)="addOrderNote()"
+            [disabled]="!newNote.trim() || addingNote"
+            [loading]="addingNote"
+          ></button>
+        </div>
+
+        <p-divider></p-divider>
+
+        <!-- Notes List -->
+        <div class="notes-list">
+          <h4><i class="pi pi-comments"></i> All Notes</h4>
+
+          @if (loadingNotes) {
+            <p-skeleton width="100%" height="200px"></p-skeleton>
+          } @else if (orderNotes.length > 0) {
+            <p-timeline [value]="orderNotes" layout="vertical">
+              <ng-template pTemplate="content" let-note>
+                <div class="note-item">
+                  <div class="note-header">
+                    <strong>{{ note.adminUsername }}</strong>
+                    <small>{{ formatDate(note.createdAt) }}</small>
+                  </div>
+                  <p class="note-text">{{ note.note }}</p>
+                </div>
+              </ng-template>
+            </p-timeline>
+          } @else {
+            <div class="empty-notes">
+              <i class="pi pi-comment"></i>
+              <p>No notes for this order yet</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayNotesDialog = false"
       ></button>
     </ng-template>
   </p-dialog>

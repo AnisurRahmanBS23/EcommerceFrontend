@@ -17,10 +17,19 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
+import { TextareaModule } from 'primeng/textarea';
+import { TimelineModule } from 'primeng/timeline';
+import { SkeletonModule } from 'primeng/skeleton';
 
 // Services & Models
-import { OrderService } from '../../../core/services/order.service';
+import { AdminService } from '../../../core/services/admin.service';
 import { Order } from '../../../core/models/order.model';
+import {
+  OrderStatus,
+  OrderStatusLabels,
+  OrderNote,
+  AddOrderNoteRequest
+} from '../../../core/models/admin.model';
 
 @Component({
   selector: 'app-order-management',
@@ -38,7 +47,10 @@ import { Order } from '../../../core/models/order.model';
     InputTextModule,
     CardModule,
     DividerModule,
-    TooltipModule
+    TooltipModule,
+    TextareaModule,
+    TimelineModule,
+    SkeletonModule
   ],
   providers: [MessageService],
   templateUrl: './order-management.html',
@@ -46,34 +58,44 @@ import { Order } from '../../../core/models/order.model';
 })
 export class OrderManagement implements OnInit, OnDestroy {
   orders: Order[] = [];
-  filteredOrders: Order[] = [];
   selectedOrder: Order | null = null;
+  orderNotes: OrderNote[] = [];
+  newNote = '';
+
   displayOrderDialog = false;
+  displayStatusDialog = false;
+  displayNotesDialog = false;
+
   loading = false;
+  loadingNotes = false;
+  updatingStatus = false;
+  addingNote = false;
+
   private destroy$ = new Subject<void>();
 
-  // Status filter
-  statusFilter = 'all';
+  // Filters
+  statusFilter: number | null = null;
+  searchTerm = '';
+  currentPage = 1;
+  pageSize = 20;
+
+  // Status options
   statusOptions = [
-    { label: 'All Orders', value: 'all' },
-    { label: 'Pending', value: 'pending' },
-    { label: 'Paid', value: 'paid' },
-    { label: 'Shipped', value: 'shipped' },
-    { label: 'Delivered', value: 'delivered' },
-    { label: 'Cancelled', value: 'cancelled' }
+    { label: 'All Orders', value: null },
+    { label: OrderStatusLabels[OrderStatus.Pending], value: OrderStatus.Pending },
+    { label: OrderStatusLabels[OrderStatus.Processing], value: OrderStatus.Processing },
+    { label: OrderStatusLabels[OrderStatus.Shipped], value: OrderStatus.Shipped },
+    { label: OrderStatusLabels[OrderStatus.Delivered], value: OrderStatus.Delivered },
+    { label: OrderStatusLabels[OrderStatus.Cancelled], value: OrderStatus.Cancelled }
   ];
 
-  // New status options for updating order
-  updateStatusOptions = [
-    { label: 'Pending', value: 'pending' },
-    { label: 'Paid', value: 'paid' },
-    { label: 'Shipped', value: 'shipped' },
-    { label: 'Delivered', value: 'delivered' },
-    { label: 'Cancelled', value: 'cancelled' }
-  ];
+  // New status for update
+  newStatus: OrderStatus = OrderStatus.Pending;
+  orderStatusEnum = OrderStatus;
+  orderStatusLabels = OrderStatusLabels;
 
   constructor(
-    private orderService: OrderService,
+    private adminService: AdminService,
     private messageService: MessageService,
     private router: Router
   ) {}
@@ -87,20 +109,19 @@ export class OrderManagement implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Load all orders (admin endpoint)
-   */
   loadOrders(): void {
     this.loading = true;
 
-    // TODO: Backend needs to implement GET /orders/api/admin/orders endpoint
-    // For now, using the user orders endpoint
-    this.orderService.getMyOrders()
+    this.adminService.getAllOrders(
+      this.statusFilter !== null ? this.statusFilter : undefined,
+      this.searchTerm || undefined,
+      this.currentPage,
+      this.pageSize
+    )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (orders) => {
           this.orders = orders;
-          this.applyFilter();
           this.loading = false;
         },
         error: (error) => {
@@ -115,105 +136,170 @@ export class OrderManagement implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Apply status filter
-   */
-  applyFilter(): void {
-    if (this.statusFilter === 'all') {
-      this.filteredOrders = [...this.orders];
-    } else {
-      this.filteredOrders = this.orders.filter(
-        order => order.status.toLowerCase() === this.statusFilter
-      );
-    }
+  onFilterChange(): void {
+    this.currentPage = 1;
+    this.loadOrders();
   }
 
-  /**
-   * Open order details dialog
-   */
+  onSearch(): void {
+    this.currentPage = 1;
+    this.loadOrders();
+  }
+
+  clearFilters(): void {
+    this.statusFilter = null;
+    this.searchTerm = '';
+    this.currentPage = 1;
+    this.loadOrders();
+  }
+
   viewOrderDetails(order: Order): void {
     this.selectedOrder = { ...order };
     this.displayOrderDialog = true;
   }
 
-  /**
-   * Update order status
-   */
-  updateOrderStatus(orderId: string, newStatus: string): void {
-    // TODO: Backend needs to implement PUT /orders/api/admin/orders/{id}/status endpoint
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Coming Soon',
-      detail: 'Order status update will be available once backend API is implemented.'
-    });
-
-    // Example of how it would work:
-    // this.orderService.updateOrderStatus(orderId, newStatus)
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({
-    //     next: () => {
-    //       this.messageService.add({
-    //         severity: 'success',
-    //         summary: 'Success',
-    //         detail: 'Order status updated successfully.'
-    //       });
-    //       this.loadOrders();
-    //       this.displayOrderDialog = false;
-    //     },
-    //     error: (error) => {
-    //       this.messageService.add({
-    //         severity: 'error',
-    //         summary: 'Error',
-    //         detail: 'Failed to update order status.'
-    //       });
-    //     }
-    //   });
+  openStatusDialog(order: Order): void {
+    this.selectedOrder = { ...order };
+    this.newStatus = this.getOrderStatusValue(order.status);
+    this.displayStatusDialog = true;
   }
 
-  /**
-   * Get status severity for tag
-   */
-  getStatusSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' {
-    switch (status.toLowerCase()) {
-      case 'delivered':
-        return 'success';
-      case 'shipped':
-        return 'info';
-      case 'paid':
-        return 'info';
-      case 'pending':
-        return 'warn';
-      case 'cancelled':
-        return 'danger';
-      default:
-        return 'info';
-    }
+  updateOrderStatus(): void {
+    if (!this.selectedOrder) return;
+
+    this.updatingStatus = true;
+
+    this.adminService.updateOrderStatus(this.selectedOrder.id, { status: this.newStatus })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Order status updated successfully.'
+          });
+          this.displayStatusDialog = false;
+          this.updatingStatus = false;
+          this.loadOrders();
+        },
+        error: (error) => {
+          console.error('Error updating order status:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to update order status.'
+          });
+          this.updatingStatus = false;
+        }
+      });
   }
 
-  /**
-   * Format status text
-   */
-  getStatusLabel(status: string): string {
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  openNotesDialog(order: Order): void {
+    this.selectedOrder = { ...order };
+    this.newNote = '';
+    this.displayNotesDialog = true;
+    this.loadOrderNotes(order.id);
   }
 
-  /**
-   * Get total items in order
-   */
+  loadOrderNotes(orderId: string): void {
+    this.loadingNotes = true;
+    this.adminService.getOrderNotes(orderId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (notes) => {
+          this.orderNotes = notes;
+          this.loadingNotes = false;
+        },
+        error: (error) => {
+          console.error('Error loading order notes:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load order notes.'
+          });
+          this.loadingNotes = false;
+        }
+      });
+  }
+
+  addOrderNote(): void {
+    if (!this.selectedOrder || !this.newNote.trim()) return;
+
+    this.addingNote = true;
+    const request: AddOrderNoteRequest = { note: this.newNote.trim() };
+
+    this.adminService.addOrderNote(this.selectedOrder.id, request)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (note) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Note added successfully.'
+          });
+          this.orderNotes = [note, ...this.orderNotes];
+          this.newNote = '';
+          this.addingNote = false;
+        },
+        error: (error) => {
+          console.error('Error adding order note:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to add note.'
+          });
+          this.addingNote = false;
+        }
+      });
+  }
+
+  getOrderStatusValue(status: string): OrderStatus {
+    const statusMap: { [key: string]: OrderStatus } = {
+      'Pending': OrderStatus.Pending,
+      'Processing': OrderStatus.Processing,
+      'Shipped': OrderStatus.Shipped,
+      'Delivered': OrderStatus.Delivered,
+      'Cancelled': OrderStatus.Cancelled
+    };
+    return statusMap[status] || OrderStatus.Pending;
+  }
+
+  getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
+    const statusMap: { [key: string]: 'success' | 'info' | 'warn' | 'danger' } = {
+      'Pending': 'warn',
+      'Processing': 'info',
+      'Shipped': 'success',
+      'Delivered': 'success',
+      'Cancelled': 'danger'
+    };
+    return statusMap[status] || 'info';
+  }
+
   getTotalItems(order: Order): number {
     return order.orderItems.reduce((sum, item) => sum + item.quantity, 0);
   }
 
-  /**
-   * Calculate order item total
-   */
   getItemTotal(item: any): number {
     return item.price * item.quantity;
   }
 
-  /**
-   * Navigate back to dashboard
-   */
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(value);
+  }
+
+  formatDate(date: Date): string {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   goBack(): void {
     this.router.navigate(['/admin/dashboard']);
   }
