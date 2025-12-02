@@ -28,9 +28,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     }
 
     // Clone the request and add the authorization header
+    const cleanToken = token.replace(/^"|"$/g, '').trim();
     const clonedRequest = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${cleanToken}`,
+        'Content-Type': 'application/json'
       }
     });
     return next(clonedRequest);

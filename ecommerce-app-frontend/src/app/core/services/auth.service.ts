@@ -163,8 +163,10 @@ export class AuthService {
    * Handle successful authentication
    */
   private handleAuthSuccess(response: AuthResponse): void {
-    // Store token
-    localStorage.setItem(this.TOKEN_KEY, response.token);
+    // Store token (sanitize to remove any extra quotes or whitespace)
+    const rawToken = response.token;
+    const sanitizedToken = rawToken ? rawToken.replace(/^"|"$/g, '').trim() : '';
+    localStorage.setItem(this.TOKEN_KEY, sanitizedToken);
 
     // Store user info with roles
     const user: User = {

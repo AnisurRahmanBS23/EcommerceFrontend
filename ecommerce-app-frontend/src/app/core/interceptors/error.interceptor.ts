@@ -42,7 +42,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             // Critical endpoints that should trigger logout
             const isAuthCriticalEndpoint =
               req.url.includes('/auth/') ||
-              (req.url.includes('/orders/') && !isCartEndpoint) ||  // Orders but NOT cart
+              (req.url.includes('/orders/') && !isCartEndpoint && !req.url.includes('/stats/')) ||  // Orders but NOT cart or stats
               req.url.includes('/checkout');
 
             if (isAuthCriticalEndpoint) {
