@@ -100,7 +100,7 @@
                     type="tel"
                     pInputText
                     formControlName="phone"
-                    placeholder="1234567890"
+                    placeholder="01712345678"
                     [class.p-invalid]="isFieldInvalid('phone')"
                   />
                   @if (isFieldInvalid('phone')) {
@@ -158,32 +158,32 @@
                 </div>
 
                 <div class="form-field">
-                  <label for="state">State *</label>
+                  <label for="division">Division *</label>
                   <input
-                    id="state"
+                    id="division"
                     type="text"
                     pInputText
-                    formControlName="state"
-                    placeholder="NY"
-                    [class.p-invalid]="isFieldInvalid('state')"
+                    formControlName="division"
+                    placeholder="Dhaka"
+                    [class.p-invalid]="isFieldInvalid('division')"
                   />
-                  @if (isFieldInvalid('state')) {
-                    <small class="p-error">{{ getFieldError('state') }}</small>
+                  @if (isFieldInvalid('division')) {
+                    <small class="p-error">{{ getFieldError('division') }}</small>
                   }
                 </div>
 
                 <div class="form-field">
-                  <label for="zipCode">ZIP Code *</label>
+                  <label for="postalCode">Postal Code *</label>
                   <input
-                    id="zipCode"
+                    id="postalCode"
                     type="text"
                     pInputText
-                    formControlName="zipCode"
-                    placeholder="10001"
-                    [class.p-invalid]="isFieldInvalid('zipCode')"
+                    formControlName="postalCode"
+                    placeholder="1205"
+                    [class.p-invalid]="isFieldInvalid('postalCode')"
                   />
-                  @if (isFieldInvalid('zipCode')) {
-                    <small class="p-error">{{ getFieldError('zipCode') }}</small>
+                  @if (isFieldInvalid('postalCode')) {
+                    <small class="p-error">{{ getFieldError('postalCode') }}</small>
                   }
                 </div>
 
@@ -194,7 +194,7 @@
                     type="text"
                     pInputText
                     formControlName="country"
-                    placeholder="United States"
+                    placeholder="Bangladesh"
                     [class.p-invalid]="isFieldInvalid('country')"
                   />
                   @if (isFieldInvalid('country')) {
@@ -234,10 +234,10 @@
                 </div>
                 <div class="item-info">
                   <p class="item-name">{{ item.productName }}</p>
-                  <p class="item-price">${{ item.price | number:'1.2-2' }} each</p>
+                  <p class="item-price">৳{{ item.price | number:'1.2-2' }} each</p>
                 </div>
                 <div class="item-total">
-                  ${{ (item.price * item.quantity) | number:'1.2-2' }}
+                  ৳{{ (item.price * item.quantity) | number:'1.2-2' }}
                 </div>
               </div>
             }
@@ -249,11 +249,11 @@
           <div class="summary-pricing">
             <div class="price-row">
               <span>Subtotal:</span>
-              <span>${{ getSubtotal() | number:'1.2-2' }}</span>
+              <span>৳{{ getSubtotal() | number:'1.2-2' }}</span>
             </div>
             <div class="price-row">
-              <span>Tax (8%):</span>
-              <span>${{ getTax() | number:'1.2-2' }}</span>
+              <span>VAT (15%):</span>
+              <span>৳{{ getTax() | number:'1.2-2' }}</span>
             </div>
             <div class="price-row">
               <span>Shipping:</span>
@@ -261,14 +261,14 @@
                 @if (getShipping() === 0) {
                   <span class="free-shipping">FREE</span>
                 } @else {
-                  ${{ getShipping() | number:'1.2-2' }}
+                  ৳{{ getShipping() | number:'1.2-2' }}
                 }
               </span>
             </div>
             <p-divider></p-divider>
             <div class="price-row total-row">
               <span>Total:</span>
-              <span class="total-amount">${{ getTotal() | number:'1.2-2' }}</span>
+              <span class="total-amount">৳{{ getTotal() | number:'1.2-2' }}</span>
             </div>
           </div>
 

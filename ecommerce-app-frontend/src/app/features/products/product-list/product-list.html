@@ -7,14 +7,8 @@
     <aside class="filters-sidebar">
       <div class="sidebar-header">
         <h3><i class="pi pi-filter"></i> Search & Filters</h3>
-        <button
-          pButton
-          type="button"
-          label="Clear All"
-          icon="pi pi-times"
-          class="p-button-text p-button-sm"
-          (click)="clearFilters()"
-        ></button>
+        <button pButton type="button" label="Clear All" icon="pi pi-times" class="p-button-text p-button-sm"
+          (click)="clearFilters()"></button>
       </div>
 
       <!-- Search Filter -->
@@ -25,13 +19,8 @@
         </label>
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input
-            type="text"
-            pInputText
-            placeholder="Search by name..."
-            [formControl]="searchControl"
-            class="search-input"
-          />
+          <input type="text" pInputText placeholder="Search by name..." [formControl]="searchControl"
+            class="search-input" />
         </span>
       </div>
 
@@ -41,15 +30,8 @@
           <i class="pi pi-sort-alt"></i>
           Sort By
         </label>
-        <p-select
-          [options]="sortOptions"
-          [(ngModel)]="selectedSort"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select sorting"
-          (onChange)="onSortChange()"
-          [style]="{'width': '100%'}"
-        ></p-select>
+        <p-select [options]="sortOptions" [(ngModel)]="selectedSort" optionLabel="label" optionValue="value"
+          placeholder="Select sorting" (onChange)="onSortChange()" [style]="{'width': '100%'}"></p-select>
       </div>
 
       <!-- Stock Filter -->
@@ -58,14 +40,8 @@
           <i class="pi pi-box"></i>
           Availability
         </label>
-        <p-selectButton
-          [options]="stockOptions"
-          [(ngModel)]="inStockOnly"
-          optionLabel="label"
-          optionValue="value"
-          (onChange)="onStockFilterChange()"
-          styleClass="stock-toggle"
-        ></p-selectButton>
+        <p-selectButton [options]="stockOptions" [(ngModel)]="inStockOnly" optionLabel="label" optionValue="value"
+          (onChange)="onStockFilterChange()" styleClass="stock-toggle"></p-selectButton>
       </div>
 
       <!-- Price Range Filter -->
@@ -78,37 +54,19 @@
         <div class="price-inputs">
           <div class="price-field">
             <label>Minimum</label>
-            <p-inputNumber
-              [(ngModel)]="minPrice"
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              [min]="0"
-              placeholder="$0"
-            ></p-inputNumber>
+            <p-inputNumber [(ngModel)]="minPrice" mode="currency" currency="BDT" locale="en-US" [min]="0"
+              placeholder="৳0"></p-inputNumber>
           </div>
 
           <div class="price-field">
             <label>Maximum</label>
-            <p-inputNumber
-              [(ngModel)]="maxPrice"
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              [min]="0"
-              placeholder="Any"
-            ></p-inputNumber>
+            <p-inputNumber [(ngModel)]="maxPrice" mode="currency" currency="BDT" locale="en-US" [min]="0"
+              placeholder="Any"></p-inputNumber>
           </div>
         </div>
 
-        <button
-          pButton
-          type="button"
-          label="Apply Price Filter"
-          icon="pi pi-check"
-          class="apply-filter-btn"
-          (click)="applyPriceFilter()"
-        ></button>
+        <button pButton type="button" label="Apply Price Filter" icon="pi pi-check" class="apply-filter-btn"
+          (click)="applyPriceFilter()"></button>
       </div>
     </aside>
 
@@ -124,91 +82,72 @@
 
       <!-- Loading State -->
       @if (loading) {
-        <div class="loading-container">
-          @for (item of [1,2,3,4,5,6,7,8]; track item) {
-            <div class="product-card">
-              <p-skeleton width="100%" height="200px"></p-skeleton>
-              <div class="p-mt-2">
-                <p-skeleton width="80%" height="1.5rem"></p-skeleton>
-                <p-skeleton width="60%" height="1rem" styleClass="p-mt-2"></p-skeleton>
-                <p-skeleton width="40%" height="1rem" styleClass="p-mt-2"></p-skeleton>
-              </div>
-            </div>
-          }
+      <div class="loading-container">
+        @for (item of [1,2,3,4,5,6,7,8]; track item) {
+        <div class="product-card">
+          <p-skeleton width="100%" height="200px"></p-skeleton>
+          <div class="p-mt-2">
+            <p-skeleton width="80%" height="1.5rem"></p-skeleton>
+            <p-skeleton width="60%" height="1rem" styleClass="p-mt-2"></p-skeleton>
+            <p-skeleton width="40%" height="1rem" styleClass="p-mt-2"></p-skeleton>
+          </div>
         </div>
+        }
+      </div>
       }
 
       <!-- Products Grid -->
       @if (!loading && products.length > 0) {
-        <div class="products-grid">
-          @for (product of products; track product.id) {
-            <div class="product-card">
-              <div class="product-image-wrapper" (click)="viewProductDetail(product.id)">
-                @if (product.imageUrl) {
-                  <img
-                    [src]="product.imageUrl"
-                    [alt]="product.name"
-                    class="product-image"
-                    (error)="onImageError($event)"
-                  />
-                } @else {
-                  <div class="no-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); z-index: 1;">
-                    <i class="pi pi-shopping-bag" style="font-size: 6rem; color: #adb5bd;"></i>
-                    <span style="font-size: 1rem; color: #6c757d; font-weight: 500; margin-top: 1rem;">Image not available</span>
-                  </div>
-                }
-
-                <!-- Stock Badge -->
-                <p-tag
-                  [value]="getStockLabel(product.stock)"
-                  [severity]="getStockSeverity(product.stock)"
-                  class="stock-badge"
-                ></p-tag>
-              </div>
-
-              <div class="product-details">
-                <h3 class="product-name" (click)="viewProductDetail(product.id)">
-                  {{ product.name }}
-                </h3>
-
-                <p class="product-description">
-                  {{ product.description | slice:0:80 }}{{ product.description.length > 80 ? '...' : '' }}
-                </p>
-
-                <div class="product-footer">
-                  <span class="product-price">${{ product.price | number:'1.2-2' }}</span>
-
-                  <button
-                    pButton
-                    type="button"
-                    icon="pi pi-shopping-cart"
-                    label="Add to Cart"
-                    class="p-button-sm"
-                    [disabled]="product.stock <= 0"
-                    (click)="addToCart(product)"
-                  ></button>
-                </div>
-              </div>
+      <div class="products-grid">
+        @for (product of products; track product.id) {
+        <div class="product-card">
+          <div class="product-image-wrapper" (click)="viewProductDetail(product.id)">
+            @if (product.imageUrl) {
+            <img [src]="product.imageUrl" [alt]="product.name" class="product-image" (error)="onImageError($event)" />
+            } @else {
+            <div class="no-image"
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); z-index: 1;">
+              <i class="pi pi-shopping-bag" style="font-size: 6rem; color: #adb5bd;"></i>
+              <span style="font-size: 1rem; color: #6c757d; font-weight: 500; margin-top: 1rem;">Image not
+                available</span>
             </div>
-          }
+            }
+
+            <!-- Stock Badge -->
+            <p-tag [value]="getStockLabel(product.stock)" [severity]="getStockSeverity(product.stock)"
+              class="stock-badge"></p-tag>
+          </div>
+
+          <div class="product-details">
+            <h3 class="product-name" (click)="viewProductDetail(product.id)">
+              {{ product.name }}
+            </h3>
+
+            <p class="product-description">
+              {{ product.description | slice:0:80 }}{{ product.description.length > 80 ? '...' : '' }}
+            </p>
+
+            <div class="product-footer">
+              <span class="product-price">৳{{ product.price | number:'1.2-2' }}</span>
+
+              <button pButton type="button" icon="pi pi-shopping-cart" label="Add to Cart" class="p-button-sm"
+                [disabled]="product.stock <= 0" (click)="addToCart(product)"></button>
+            </div>
+          </div>
         </div>
+        }
+      </div>
       }
 
       <!-- Empty State -->
       @if (!loading && products.length === 0) {
-        <div class="empty-state">
-          <i class="pi pi-inbox empty-icon"></i>
-          <h3>No Products Found</h3>
-          <p>Try adjusting your search or filters</p>
-          <button
-            pButton
-            type="button"
-            label="Clear All Filters"
-            icon="pi pi-refresh"
-            class="p-button-outlined"
-            (click)="clearFilters()"
-          ></button>
-        </div>
+      <div class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <h3>No Products Found</h3>
+        <p>Try adjusting your search or filters</p>
+        <button pButton type="button" label="Clear All Filters" icon="pi pi-refresh" class="p-button-outlined"
+          (click)="clearFilters()"></button>
+      </div>
       }
     </main>
   </div>

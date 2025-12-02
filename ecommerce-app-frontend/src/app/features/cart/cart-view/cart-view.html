@@ -10,185 +10,141 @@
 
   <!-- Empty Cart State -->
   @if (cartItems.length === 0) {
-    <div class="empty-cart">
-      <i class="pi pi-shopping-cart empty-icon"></i>
-      <h2>Your Cart is Empty</h2>
-      <p>Looks like you haven't added anything to your cart yet.</p>
-      <button
-        pButton
-        type="button"
-        label="Start Shopping"
-        icon="pi pi-arrow-left"
-        class="p-button-lg"
-        (click)="continueShopping()"
-      ></button>
-    </div>
+  <div class="empty-cart">
+    <i class="pi pi-shopping-cart empty-icon"></i>
+    <h2>Your Cart is Empty</h2>
+    <p>Looks like you haven't added anything to your cart yet.</p>
+    <button pButton type="button" label="Start Shopping" icon="pi pi-arrow-left" class="p-button-lg"
+      (click)="continueShopping()"></button>
+  </div>
   }
 
   <!-- Cart with Items -->
   @if (cartItems.length > 0) {
-    <div class="cart-content">
-      <!-- Cart Items -->
-      <div class="cart-items">
-        <p-card>
-          <div class="items-header">
-            <h3>Cart Items</h3>
-            <button
-              pButton
-              type="button"
-              label="Clear Cart"
-              icon="pi pi-trash"
-              class="p-button-sm p-button-danger p-button-text"
-              (click)="confirmClearCart()"
-            ></button>
-          </div>
+  <div class="cart-content">
+    <!-- Cart Items -->
+    <div class="cart-items">
+      <p-card>
+        <div class="items-header">
+          <h3>Cart Items</h3>
+          <button pButton type="button" label="Clear Cart" icon="pi pi-trash"
+            class="p-button-sm p-button-danger p-button-text" (click)="confirmClearCart()"></button>
+        </div>
 
-          <p-divider></p-divider>
+        <p-divider></p-divider>
 
-          <!-- Item List -->
-          @for (item of cartItems; track item.productId) {
-            <div class="cart-item">
-              <!-- Product Image -->
-              <div class="item-image" (click)="viewProduct(item.productId)">
-                @if (item.imageUrl) {
-                  <img
-                    [src]="item.imageUrl"
-                    [alt]="item.productName"
-                    (error)="onImageError($event)"
-                  />
-                } @else {
-                  <div class="no-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
-                    <i class="pi pi-shopping-bag" style="font-size: 3rem; color: #adb5bd;"></i>
-                    <span style="font-size: 0.7rem; color: #6c757d; font-weight: 500; margin-top: 0.5rem;">No image</span>
-                  </div>
-                }
-              </div>
-
-              <!-- Product Info -->
-              <div class="item-details">
-                <h4 class="item-name" (click)="viewProduct(item.productId)">
-                  {{ item.productName }}
-                </h4>
-                <p class="item-price">${{ item.price | number:'1.2-2' }} each</p>
-              </div>
-
-              <!-- Quantity Controls -->
-              <div class="item-quantity">
-                <label>Quantity</label>
-                <p-inputNumber
-                  [(ngModel)]="item.quantity"
-                  [showButtons]="true"
-                  buttonLayout="horizontal"
-                  [min]="1"
-                  [max]="99"
-                  inputId="horizontal"
-                  decrementButtonClass="p-button-danger"
-                  incrementButtonClass="p-button-success"
-                  incrementButtonIcon="pi pi-plus"
-                  decrementButtonIcon="pi pi-minus"
-                  (onInput)="updateQuantity(item, item.quantity)"
-                ></p-inputNumber>
-              </div>
-
-              <!-- Item Total -->
-              <div class="item-total">
-                <label>Total</label>
-                <p class="total-price">${{ getItemTotal(item) | number:'1.2-2' }}</p>
-              </div>
-
-              <!-- Remove Button -->
-              <div class="item-actions">
-                <button
-                  pButton
-                  type="button"
-                  icon="pi pi-trash"
-                  class="p-button-rounded p-button-danger p-button-text"
-                  pTooltip="Remove item"
-                  tooltipPosition="top"
-                  (click)="confirmRemoveItem(item)"
-                ></button>
-              </div>
+        <!-- Item List -->
+        @for (item of cartItems; track item.productId) {
+        <div class="cart-item">
+          <!-- Product Image -->
+          <div class="item-image" (click)="viewProduct(item.productId)">
+            @if (item.imageUrl) {
+            <img [src]="item.imageUrl" [alt]="item.productName" (error)="onImageError($event)" />
+            } @else {
+            <div class="no-image"
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+              <i class="pi pi-shopping-bag" style="font-size: 3rem; color: #adb5bd;"></i>
+              <span style="font-size: 0.7rem; color: #6c757d; font-weight: 500; margin-top: 0.5rem;">No image</span>
             </div>
-
-            <p-divider></p-divider>
-          }
-
-          <!-- Continue Shopping Button -->
-          <div class="continue-shopping">
-            <button
-              pButton
-              type="button"
-              label="Continue Shopping"
-              icon="pi pi-arrow-left"
-              class="p-button-outlined"
-              (click)="continueShopping()"
-            ></button>
-          </div>
-        </p-card>
-      </div>
-
-      <!-- Order Summary -->
-      <div class="order-summary">
-        <p-card>
-          <ng-template pTemplate="header">
-            <h3>Order Summary</h3>
-          </ng-template>
-
-          <div class="summary-row">
-            <span>Subtotal:</span>
-            <span class="amount">${{ getSubtotal() | number:'1.2-2' }}</span>
+            }
           </div>
 
-          <div class="summary-row">
-            <span>Tax (8%):</span>
-            <span class="amount">${{ getTax() | number:'1.2-2' }}</span>
+          <!-- Product Info -->
+          <div class="item-details">
+            <h4 class="item-name" (click)="viewProduct(item.productId)">
+              {{ item.productName }}
+            </h4>
+            <p class="item-price">৳{{ item.price | number:'1.2-2' }} each</p>
           </div>
 
-          <div class="summary-row">
-            <span>Shipping:</span>
-            <span class="amount">
-              @if (getShipping() === 0) {
-                <span class="free-shipping">FREE</span>
-              } @else {
-                ${{ getShipping() | number:'1.2-2' }}
-              }
-            </span>
+          <!-- Quantity Controls -->
+          <div class="item-quantity">
+            <label>Quantity</label>
+            <p-inputNumber [(ngModel)]="item.quantity" [showButtons]="true" buttonLayout="horizontal" [min]="1"
+              [max]="99" inputId="horizontal" decrementButtonClass="p-button-danger"
+              incrementButtonClass="p-button-success" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+              (onInput)="updateQuantity(item, item.quantity)"></p-inputNumber>
           </div>
 
-          @if (getSubtotal() < 50 && getSubtotal() > 0) {
-            <div class="shipping-notice">
-              <i class="pi pi-info-circle"></i>
-              <span>Add ${{ 50 - getSubtotal() | number:'1.2-2' }} more for free shipping!</span>
-            </div>
+          <!-- Item Total -->
+          <div class="item-total">
+            <label>Total</label>
+            <p class="total-price">৳{{ getItemTotal(item) | number:'1.2-2' }}</p>
+          </div>
+
+          <!-- Remove Button -->
+          <div class="item-actions">
+            <button pButton type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text"
+              pTooltip="Remove item" tooltipPosition="top" (click)="confirmRemoveItem(item)"></button>
+          </div>
+        </div>
+
+        <p-divider></p-divider>
+        }
+
+        <!-- Continue Shopping Button -->
+        <div class="continue-shopping">
+          <button pButton type="button" label="Continue Shopping" icon="pi pi-arrow-left" class="p-button-outlined"
+            (click)="continueShopping()"></button>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <p-card>
+        <ng-template pTemplate="header">
+          <h3>Order Summary</h3>
+        </ng-template>
+
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span class="amount">৳{{ getSubtotal() | number:'1.2-2' }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span>VAT (15%):</span>
+          <span class="amount">৳{{ getTax() | number:'1.2-2' }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Shipping:</span>
+          <span class="amount">
+            @if (getShipping() === 0) {
+            <span class="free-shipping">FREE</span>
+            } @else {
+            ৳{{ getShipping() | number:'1.2-2' }}
+            }
+          </span>
+        </div>
+
+        @if (getSubtotal() < 5000 && getSubtotal()> 0) {
+          <div class="shipping-notice">
+            <i class="pi pi-info-circle"></i>
+            <span>Add ৳{{ 5000 - getSubtotal() | number:'1.2-2' }} more for free shipping!</span>
+          </div>
           }
 
           <p-divider></p-divider>
 
           <div class="summary-row total-row">
             <span>Total:</span>
-            <span class="total-amount">${{ getTotal() | number:'1.2-2' }}</span>
+            <span class="total-amount">৳{{ getTotal() | number:'1.2-2' }}</span>
           </div>
 
           <ng-template pTemplate="footer">
-            <button
-              pButton
-              type="button"
-              label="Proceed to Checkout"
-              icon="pi pi-arrow-right"
-              iconPos="right"
-              class="p-button-lg checkout-button"
-              (click)="proceedToCheckout()"
-            ></button>
+            <button pButton type="button" label="Proceed to Checkout" icon="pi pi-arrow-right" iconPos="right"
+              class="p-button-lg checkout-button" (click)="proceedToCheckout()"></button>
 
             @if (!isAuthenticated) {
-              <p class="login-notice">
-                <i class="pi pi-info-circle"></i>
-                You need to login to checkout
-              </p>
+            <p class="login-notice">
+              <i class="pi pi-info-circle"></i>
+              You need to login to checkout
+            </p>
             }
           </ng-template>
-        </p-card>
-      </div>
+      </p-card>
     </div>
+  </div>
   }
 </div>

@@ -169,18 +169,18 @@ export class CartView implements OnInit, OnDestroy {
   }
 
   /**
-   * Calculate tax (8%)
+   * Calculate VAT (15% - Bangladesh standard)
    */
   getTax(): number {
-    return this.getSubtotal() * 0.08;
+    return this.getSubtotal() * 0.15;
   }
 
   /**
-   * Calculate shipping (free over $50)
+   * Calculate shipping (free over ৳5000)
    */
   getShipping(): number {
     const subtotal = this.getSubtotal();
-    return subtotal > 50 ? 0 : 5.99;
+    return subtotal > 5000 ? 0 : 60;  // ৳60 shipping fee, free over ৳5000
   }
 
   /**

@@ -51,7 +51,7 @@ export class Checkout implements OnInit, OnDestroy {
     private cartService: CartService,
     private messageService: MessageService,
     public router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
@@ -70,13 +70,13 @@ export class Checkout implements OnInit, OnDestroy {
     this.checkoutForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      phone: ['', [Validators.required, Validators.pattern(/^01[0-9]{9}$/)]],  // Bangladesh mobile: 01XXXXXXXXX
       addressLine1: ['', [Validators.required, Validators.minLength(5)]],
       addressLine2: [''],
       city: ['', [Validators.required, Validators.minLength(2)]],
-      state: ['', [Validators.required, Validators.minLength(2)]],
-      zipCode: ['', [Validators.required, Validators.pattern(/^\d{5}(-\d{4})?$/)]],
-      country: ['United States', Validators.required]
+      division: ['', [Validators.required, Validators.minLength(2)]],  // Bangladesh divisions (Dhaka, Chittagong, etc.)
+      postalCode: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],  // Bangladesh postal code: 4 digits
+      country: ['Bangladesh', Validators.required]
     });
   }
 
@@ -127,7 +127,7 @@ export class Checkout implements OnInit, OnDestroy {
     this.loading = true;
 
     const formValue = this.checkoutForm.value;
-    const shippingAddress = `${formValue.addressLine1}, ${formValue.addressLine2 ? formValue.addressLine2 + ', ' : ''}${formValue.city}, ${formValue.state} ${formValue.zipCode}, ${formValue.country}`;
+    const shippingAddress = `${formValue.addressLine1}, ${formValue.addressLine2 ? formValue.addressLine2 + ', ' : ''}${formValue.city}, ${formValue.division} ${formValue.postalCode}, ${formValue.country}`;
 
     const orderDto: CreateOrderDto = {
       items: this.cartItems.map(item => ({
@@ -201,8 +201,8 @@ export class Checkout implements OnInit, OnDestroy {
     if (field?.hasError('required')) return `${fieldName} is required`;
     if (field?.hasError('email')) return 'Invalid email format';
     if (field?.hasError('pattern')) {
-      if (fieldName === 'phone') return 'Phone must be 10 digits';
-      if (fieldName === 'zipCode') return 'Invalid ZIP code format';
+      if (fieldName === 'phone') return 'Phone must be 11 digits (01XXXXXXXXX)';
+      if (fieldName === 'postalCode') return 'Postal code must be 4 digits';
     }
     if (field?.hasError('minLength')) return `${fieldName} is too short`;
     return '';
@@ -216,18 +216,18 @@ export class Checkout implements OnInit, OnDestroy {
   }
 
   /**
-   * Calculate tax (8%)
+   * Calculate VAT (15% - Bangladesh standard)
    */
   getTax(): number {
-    return this.getSubtotal() * 0.08;
+    return this.getSubtotal() * 0.15;
   }
 
   /**
-   * Calculate shipping (free over $50)
+   * Calculate shipping (free over ৳5000)
    */
   getShipping(): number {
     const subtotal = this.getSubtotal();
-    return subtotal > 50 ? 0 : 5.99;
+    return subtotal > 5000 ? 0 : 60;  // ৳60 shipping fee, free over ৳5000
   }
 
   /**
