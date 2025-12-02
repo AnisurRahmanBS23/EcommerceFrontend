@@ -21,7 +21,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router
-  ) {}
+  ) { }
 
   /**
    * Register a new user
@@ -76,7 +76,40 @@ export class AuthService {
    * Check if user is authenticated
    */
   isLoggedIn(): boolean {
-    return this.hasToken();
+    return this.hasToken() && !this.isTokenExpired();
+  }
+
+  /**
+   * Check if token is expired
+   */
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+
+    try {
+      // Decode JWT token payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      // Check if token has expiration claim
+      if (!payload.exp) {
+        console.warn('Token does not have expiration claim');
+        return false; // Assume valid if no exp claim
+      }
+
+      // Convert exp to milliseconds and compare with current time
+      const expirationTime = payload.exp * 1000;
+      const currentTime = Date.now();
+      const isExpired = currentTime >= expirationTime;
+
+      if (isExpired) {
+        console.warn('Token has expired');
+      }
+
+      return isExpired;
+    } catch (error) {
+      console.error('Error parsing token:', error);
+      return true; // Treat invalid tokens as expired
+    }
   }
 
   /**

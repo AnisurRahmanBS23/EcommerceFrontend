@@ -49,11 +49,11 @@ export class CartView implements OnInit, OnDestroy {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Check authentication status
-    this.isAuthenticated = this.authService.isAuthenticated();
+    this.isAuthenticated = this.authService.isLoggedIn();
 
     // Subscribe to cart items
     this.cartService.cartItems$
@@ -83,19 +83,16 @@ export class CartView implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.loading = false;
+          console.log('Cart synced successfully from backend');
         },
         error: (error) => {
-          // If cart not found (404), it's okay - user just has an empty cart
-          // Only show error for other status codes
-          if (!error.message?.includes('not found') && !error.message?.includes('404')) {
-            console.error('Error loading cart:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to load cart. Using local cart.'
-            });
-          }
+          // Silently fail - cart works from localStorage anyway
+          // This prevents user disruption when backend cart endpoint is unavailable
+          console.warn('Could not sync cart from backend, using local cart:', error);
           this.loading = false;
+
+          // Don't show error toast - it's not critical for user experience
+          // The cart will continue to work perfectly with localStorage
         }
       });
   }

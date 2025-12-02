@@ -21,7 +21,20 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             break;
           case 401:
             errorMessage = 'Unauthorized. Please login again.';
-            authService.logout(); // This will redirect to /products
+            
+            // Only logout if the 401 is from an auth-critical endpoint
+            // Don't logout for optional endpoints like cart sync
+            const isAuthCriticalEndpoint = 
+              req.url.includes('/auth/') || 
+              req.url.includes('/orders/') ||
+              req.url.includes('/checkout');
+            
+            if (isAuthCriticalEndpoint) {
+              console.error('Authentication failed on critical endpoint:', req.url);
+              authService.logout(); // This will redirect to /products
+            } else {
+              console.warn('401 Unauthorized on non-critical endpoint:', req.url, '- User remains logged in');
+            }
             break;
           case 403:
             errorMessage = 'Access forbidden';
