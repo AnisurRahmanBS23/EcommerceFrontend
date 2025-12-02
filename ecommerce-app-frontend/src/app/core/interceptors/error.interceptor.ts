@@ -21,19 +21,35 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             break;
           case 401:
             errorMessage = 'Unauthorized. Please login again.';
-            
+
+            // Log detailed 401 error information for debugging
+            console.group('🔴 401 Unauthorized Error Details');
+            console.log('Request URL:', req.url);
+            console.log('Request Method:', req.method);
+            console.log('Backend Error Message:', error.error?.message || 'No message provided');
+            console.log('Backend Error:', error.error);
+            console.log('Status Text:', error.statusText);
+            console.log('Headers Sent:', req.headers.keys());
+            console.log('Has Authorization Header:', req.headers.has('Authorization'));
+            console.groupEnd();
+
             // Only logout if the 401 is from an auth-critical endpoint
             // Don't logout for optional endpoints like cart sync
-            const isAuthCriticalEndpoint = 
-              req.url.includes('/auth/') || 
-              req.url.includes('/orders/') ||
+
+            // Cart endpoints should NOT trigger logout (even though URL contains /orders/)
+            const isCartEndpoint = req.url.includes('/cart');
+
+            // Critical endpoints that should trigger logout
+            const isAuthCriticalEndpoint =
+              req.url.includes('/auth/') ||
+              (req.url.includes('/orders/') && !isCartEndpoint) ||  // Orders but NOT cart
               req.url.includes('/checkout');
-            
+
             if (isAuthCriticalEndpoint) {
-              console.error('Authentication failed on critical endpoint:', req.url);
+              console.error('❌ Authentication failed on critical endpoint:', req.url);
               authService.logout(); // This will redirect to /products
             } else {
-              console.warn('401 Unauthorized on non-critical endpoint:', req.url, '- User remains logged in');
+              console.warn('⚠️ 401 Unauthorized on non-critical endpoint:', req.url, '- User remains logged in');
             }
             break;
           case 403:
