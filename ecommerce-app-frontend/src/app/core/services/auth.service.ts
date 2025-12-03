@@ -48,6 +48,18 @@ export class AuthService {
   }
 
   /**
+   * Login with Google
+   */
+  loginWithGoogle(idToken: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(
+      `${environment.authApi}/auth/google-login`,
+      { idToken }
+    ).pipe(
+      tap(response => this.handleAuthSuccess(response))
+    );
+  }
+
+  /**
    * Logout user
    */
   logout(): void {
