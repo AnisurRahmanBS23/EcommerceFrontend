@@ -14,6 +14,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { PaginatorModule } from 'primeng/paginator';
 
 // Services & Models
 import { ProductService } from '../../../core/services/product.service';
@@ -39,7 +40,8 @@ interface SortOption {
     TagModule,
     SkeletonModule,
     ToastModule,
-    InputNumberModule
+    InputNumberModule,
+    PaginatorModule
   ],
   providers: [MessageService],
   templateUrl: './product-list.html',
@@ -49,8 +51,10 @@ export class ProductList implements OnInit, OnDestroy {
   products: Product[] = [];
   loading = false;
 
-  // Pagination (client-side since backend returns all products)
+  // Pagination
   pageSize = 12;
+  totalRecords = 0;
+  first = 0;
 
   // Search
   searchControl = new FormControl('');
@@ -82,7 +86,7 @@ export class ProductList implements OnInit, OnDestroy {
     private cartService: CartService,
     private messageService: MessageService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadProducts();
@@ -116,8 +120,11 @@ export class ProductList implements OnInit, OnDestroy {
     this.loading = true;
 
     const [sortBy, sortOrder] = this.parseSortOption(this.selectedSort);
+    const page = (this.first / this.pageSize) + 1;
 
     const queryParams: ProductQueryParams = {
+      page,
+      pageSize: this.pageSize,
       search: this.searchControl.value || undefined,
       sortBy,
       sortOrder,
@@ -131,6 +138,7 @@ export class ProductList implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.products = response.items;
+          this.totalRecords = response.totalCount;
           this.loading = false;
         },
         error: (error) => {
@@ -144,6 +152,13 @@ export class ProductList implements OnInit, OnDestroy {
         }
       });
   }
+
+  onPageChange(event: any): void {
+    this.first = event.first;
+    this.pageSize = event.rows;
+    this.loadProducts();
+  }
+
 
   /**
    * Parse sort option into sortBy and sortOrder
