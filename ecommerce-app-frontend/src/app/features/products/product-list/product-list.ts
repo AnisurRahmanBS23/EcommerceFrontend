@@ -79,6 +79,9 @@ export class ProductList implements OnInit, OnDestroy {
     { label: 'In Stock Only', value: true }
   ];
 
+  // Filter visibility toggle
+  filtersVisible = false;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -199,6 +202,13 @@ export class ProductList implements OnInit, OnDestroy {
     this.inStockOnly = false;
     this.selectedSort = 'date_desc';
     this.loadProducts();
+  }
+
+  /**
+   * Toggle filter visibility
+   */
+  toggleFilters(): void {
+    this.filtersVisible = !this.filtersVisible;
   }
 
   /**

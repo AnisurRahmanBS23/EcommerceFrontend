@@ -17,7 +17,7 @@ import {
 export class ProductService {
   private apiUrl = `${environment.productApi}/products`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Get all products with pagination, filtering, and sorting
