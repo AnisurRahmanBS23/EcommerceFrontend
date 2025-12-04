@@ -39,10 +39,8 @@
         <span>OR</span>
       </div>
 
-      <!-- Google Sign-In Button -->
-      <button pButton type="button" label="Sign in with Google" icon="pi pi-google" class="w-full google-button mb-4"
-        [loading]="googleLoading" [disabled]="googleLoading" (click)="signInWithGoogle()">
-      </button>
+      <!-- Google Sign-In Button Container -->
+      <div id="googleSignInButton" class="google-signin-container mb-4"></div>
 
       <!-- Register Link -->
       <div class="register-link">

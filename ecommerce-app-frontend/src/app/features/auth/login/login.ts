@@ -59,8 +59,22 @@ export class Login implements OnInit {
     if (typeof google !== 'undefined') {
       google.accounts.id.initialize({
         client_id: '306628083972-mmnb0emv57peap4tuhoaukj61mhjucu9.apps.googleusercontent.com',
-        callback: this.handleGoogleSignIn.bind(this)
+        callback: this.handleGoogleSignIn.bind(this),
+        auto_select: false,
+        cancel_on_tap_outside: true
       });
+
+      // Render the button instead of using prompt()
+      google.accounts.id.renderButton(
+        document.getElementById('googleSignInButton'),
+        {
+          theme: 'outline',
+          size: 'large',
+          width: '100%',
+          text: 'signin_with',
+          shape: 'rectangular'
+        }
+      );
     }
   }
 
@@ -88,18 +102,6 @@ export class Login implements OnInit {
         console.error('Login error:', error);
       }
     });
-  }
-
-  signInWithGoogle(): void {
-    this.googleLoading = true;
-    this.errorMessage = '';
-
-    if (typeof google !== 'undefined') {
-      google.accounts.id.prompt();
-    } else {
-      this.googleLoading = false;
-      this.errorMessage = 'Google Sign-In is not available. Please try again later.';
-    }
   }
 
   private handleGoogleSignIn(response: any): void {
