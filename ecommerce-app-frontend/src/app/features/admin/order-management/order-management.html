@@ -80,7 +80,7 @@
             <span class="order-total">৳{{ order.totalAmount | number:'1.2-2' }}</span>
           </td>
           <td>
-            <p-tag [value]="order.status" [severity]="getStatusSeverity(order.status)"></p-tag>
+            <p-tag [value]="getStatusString(order.status)" [severity]="getStatusSeverity(order.status)"></p-tag>
           </td>
           <td>
             <div class="action-buttons">
@@ -134,7 +134,8 @@
         </div>
         <div class="info-item">
           <label>Status:</label>
-          <p-tag [value]="selectedOrder.status" [severity]="getStatusSeverity(selectedOrder.status)"></p-tag>
+          <p-tag [value]="getStatusString(selectedOrder.status)"
+            [severity]="getStatusSeverity(selectedOrder.status)"></p-tag>
         </div>
         <div class="info-item">
           <label>Total Amount:</label>
@@ -160,10 +161,10 @@
           <div class="order-item">
             <div class="item-info">
               <span class="item-name">{{ item.productName }}</span>
-              <span class="item-details">{{ item.quantity }} × ৳{{ item.price | number:'1.2-2' }}</span>
+              <span class="item-details">{{ item.quantity }} × ৳{{ item.unitPrice | number:'1.2-2' }}</span>
             </div>
             <div class="item-total">
-              ৳{{ (item.price * item.quantity) | number:'1.2-2' }}
+              ৳{{ (item.unitPrice * item.quantity) | number:'1.2-2' }}
             </div>
           </div>
           }
@@ -189,36 +190,6 @@
     <ng-template pTemplate="footer">
       <button pButton type="button" label="Close" icon="pi pi-times" class="p-button-text"
         (click)="displayOrderDialog = false"></button>
-    </ng-template>
-  </p-dialog>
-
-  <!-- Update Status Dialog -->
-  <p-dialog [(visible)]="displayStatusDialog" [modal]="true" [style]="{width: '500px'}" [draggable]="false"
-    [resizable]="false" header="Update Order Status">
-    @if (selectedOrder) {
-    <div class="status-update-content">
-      <p class="dialog-info">
-        Update status for Order <strong>{{ selectedOrder.id.substring(0, 8) }}...</strong>
-      </p>
-
-      <div class="form-field">
-        <label for="status">Current Status:</label>
-        <p-tag [value]="selectedOrder.status" [severity]="getStatusSeverity(selectedOrder.status)"></p-tag>
-      </div>
-
-      <div class="form-field">
-        <label for="new-status">New Status:</label>
-        <p-select inputId="new-status" [options]="statusOptions.slice(1)" [(ngModel)]="newStatus" optionLabel="label"
-          optionValue="value" placeholder="Select new status" [style]="{'width': '100%'}"></p-select>
-      </div>
-    </div>
-    }
-
-    <ng-template pTemplate="footer">
-      <button pButton type="button" label="Cancel" icon="pi pi-times" class="p-button-text"
-        (click)="displayStatusDialog = false" [disabled]="updatingStatus"></button>
-      <button pButton type="button" label="Update" icon="pi pi-check" class="p-button-success"
-        (click)="updateOrderStatus()" [loading]="updatingStatus"></button>
     </ng-template>
   </p-dialog>
 

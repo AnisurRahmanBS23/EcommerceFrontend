@@ -98,7 +98,7 @@ export class OrderManagement implements OnInit, OnDestroy {
     private adminService: AdminService,
     private messageService: MessageService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadOrders();
@@ -253,7 +253,13 @@ export class OrderManagement implements OnInit, OnDestroy {
       });
   }
 
-  getOrderStatusValue(status: string): OrderStatus {
+  getOrderStatusValue(status: string | number): OrderStatus {
+    // If already a number (enum), return it
+    if (typeof status === 'number') {
+      return status as OrderStatus;
+    }
+
+    // Convert string to enum
     const statusMap: { [key: string]: OrderStatus } = {
       'Pending': OrderStatus.Pending,
       'Processing': OrderStatus.Processing,
@@ -264,7 +270,8 @@ export class OrderManagement implements OnInit, OnDestroy {
     return statusMap[status] || OrderStatus.Pending;
   }
 
-  getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
+  getStatusSeverity(status: string | number): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
+    const statusStr = this.getStatusString(status);
     const statusMap: { [key: string]: 'success' | 'info' | 'warn' | 'danger' } = {
       'Pending': 'warn',
       'Processing': 'info',
@@ -272,7 +279,21 @@ export class OrderManagement implements OnInit, OnDestroy {
       'Delivered': 'success',
       'Cancelled': 'danger'
     };
-    return statusMap[status] || 'info';
+    return statusMap[statusStr] || 'info';
+  }
+
+  getStatusString(status: string | number): string {
+    if (typeof status === 'number') {
+      const statusMap: { [key: number]: string } = {
+        0: 'Pending',
+        1: 'Processing',
+        2: 'Shipped',
+        3: 'Delivered',
+        4: 'Cancelled'
+      };
+      return statusMap[status] || 'Pending';
+    }
+    return status;
   }
 
   getTotalItems(order: Order): number {
@@ -280,7 +301,7 @@ export class OrderManagement implements OnInit, OnDestroy {
   }
 
   getItemTotal(item: any): number {
-    return item.price * item.quantity;
+    return item.unitPrice * item.quantity;
   }
 
   formatCurrency(value: number): string {

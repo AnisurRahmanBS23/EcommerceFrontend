@@ -40,7 +40,7 @@ export class OrderList implements OnInit, OnDestroy {
     private orderService: OrderService,
     private messageService: MessageService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadOrders();
@@ -86,24 +86,48 @@ export class OrderList implements OnInit, OnDestroy {
   /**
    * Get status severity for tag
    */
-  getStatusSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' {
-    switch (status.toLowerCase()) {
+  getStatusSeverity(status: string | number): 'success' | 'warn' | 'danger' | 'info' {
+    const statusStr = this.getStatusString(status);
+    switch (statusStr.toLowerCase()) {
+      case 'delivered':
       case 'completed':
         return 'success';
       case 'pending':
         return 'warn';
       case 'cancelled':
         return 'danger';
+      case 'processing':
+      case 'shipped':
+        return 'info';
       default:
         return 'info';
     }
   }
 
   /**
+   * Convert numeric status to string
+   */
+  private getStatusString(status: string | number): string {
+    if (typeof status === 'string') return status;
+
+    // Backend enum: 0=Pending, 1=Processing, 2=Shipped, 3=Delivered, 4=Cancelled
+    const statusMap: { [key: number]: string } = {
+      0: 'Pending',
+      1: 'Processing',
+      2: 'Shipped',
+      3: 'Delivered',
+      4: 'Cancelled'
+    };
+
+    return statusMap[status] || 'Unknown';
+  }
+
+  /**
    * Format status text
    */
-  getStatusLabel(status: string): string {
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  getStatusLabel(status: string | number): string {
+    const statusStr = this.getStatusString(status);
+    return statusStr.charAt(0).toUpperCase() + statusStr.slice(1).toLowerCase();
   }
 
   /**

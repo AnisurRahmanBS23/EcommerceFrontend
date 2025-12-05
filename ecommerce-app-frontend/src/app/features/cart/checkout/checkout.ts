@@ -130,11 +130,13 @@ export class Checkout implements OnInit, OnDestroy {
     const shippingAddress = `${formValue.addressLine1}, ${formValue.addressLine2 ? formValue.addressLine2 + ', ' : ''}${formValue.city}, ${formValue.division} ${formValue.postalCode}, ${formValue.country}`;
 
     const orderDto: CreateOrderDto = {
+      customerName: formValue.fullName,
+      customerEmail: formValue.email,
       items: this.cartItems.map(item => ({
         productId: item.productId,
         productName: item.productName,
         quantity: item.quantity,
-        price: item.price,
+        unitPrice: item.price,
         imageUrl: item.imageUrl
       })),
       shippingAddress: shippingAddress,

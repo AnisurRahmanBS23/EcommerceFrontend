@@ -7,7 +7,7 @@ export interface Order {
   customerEmail: string;
   shippingAddress: string;
   totalAmount: number;
-  status: string;
+  status: string | number;  // Backend returns numeric enum (0=Pending, 1=Processing, etc.)
   orderItems: OrderItem[];
   createdAt: Date;
   updatedAt?: Date;
@@ -18,12 +18,15 @@ export interface OrderItem {
   orderId: string;
   productId: string;
   productName: string;
-  price: number;
+  unitPrice: number;
   quantity: number;
+  totalPrice?: number;  // Backend calculates this
   imageUrl?: string;
 }
 
 export interface CreateOrderDto {
+  customerName: string;
+  customerEmail: string;
   shippingAddress: string;
   totalAmount: number;
   items: OrderItemDto[];
@@ -32,7 +35,7 @@ export interface CreateOrderDto {
 export interface OrderItemDto {
   productId: string;
   productName: string;
-  price: number;
+  unitPrice: number;
   quantity: number;
   imageUrl?: string;
 }
@@ -44,7 +47,7 @@ export interface OrderResponseDto {
   customerEmail: string;
   shippingAddress: string;
   totalAmount: number;
-  status: string;
+  status: string | number;  // Backend returns numeric enum
   orderItems: OrderItemResponseDto[];
   createdAt: Date;
   updatedAt?: Date;
@@ -55,7 +58,8 @@ export interface OrderItemResponseDto {
   orderId: string;
   productId: string;
   productName: string;
-  price: number;
+  unitPrice: number;
   quantity: number;
+  totalPrice?: number;  // Backend calculates this
   imageUrl?: string;
 }
