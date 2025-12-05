@@ -17,10 +17,10 @@ import { Order } from '../models/order.model';
   providedIn: 'root'
 })
 export class AdminService {
-  private readonly orderApiUrl = `${environment.orderApi}/admin`;
-  private readonly productApiUrl = `${environment.productApi}/admin`;
+  private readonly orderApiUrl = `${environment.orderApi}/admin/orders`;
+  private readonly productApiUrl = `${environment.productApi}/admin/products`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Statistics endpoints
   getStatsOverview(): Observable<AdminStatsOverview> {

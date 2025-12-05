@@ -84,11 +84,15 @@ export class Checkout implements OnInit, OnDestroy {
    * Load cart items
    */
   loadCartItems(): void {
+    let isInitialLoad = true;
+
     this.cartService.cartItems$
       .pipe(takeUntil(this.destroy$))
       .subscribe(items => {
         this.cartItems = items;
-        if (items.length === 0) {
+
+        // Only redirect if cart becomes empty AFTER initial load and order hasn't been placed
+        if (items.length === 0 && !isInitialLoad && !this.orderPlaced) {
           this.messageService.add({
             severity: 'warn',
             summary: 'Empty Cart',
@@ -98,6 +102,8 @@ export class Checkout implements OnInit, OnDestroy {
             this.router.navigate(['/products']);
           }, 2000);
         }
+
+        isInitialLoad = false;
       });
   }
 
