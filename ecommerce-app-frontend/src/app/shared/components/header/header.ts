@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
+import { WishlistService } from '../../../core/services/wishlist.service';
 
 // PrimeNG Imports
 import { ToolbarModule } from 'primeng/toolbar';
@@ -35,11 +36,13 @@ import { FormsModule } from '@angular/forms';
 export class Header implements OnInit {
   authService = inject(AuthService);
   cartService = inject(CartService);
+  wishlistService = inject(WishlistService);
   router = inject(Router);
 
   isAuthenticated = this.authService.isAuthenticated;
   currentUser = this.authService.currentUser$;
   cartItemCount = this.cartService.itemCount;
+  wishlistItemCount = this.wishlistService.itemCount;
 
   userMenuItems: MenuItem[] = [];
 
@@ -126,6 +129,10 @@ export class Header implements OnInit {
 
   navigateToCart(): void {
     this.router.navigate(['/cart']);
+  }
+
+  navigateToWishlist(): void {
+    this.router.navigate(['/wishlist']);
   }
 
   navigateToProducts(): void {

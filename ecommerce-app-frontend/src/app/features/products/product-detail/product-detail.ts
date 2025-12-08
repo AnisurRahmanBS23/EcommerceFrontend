@@ -17,6 +17,7 @@ import { CardModule } from 'primeng/card';
 // Services & Models
 import { ProductService } from '../../../core/services/product.service';
 import { CartService } from '../../../core/services/cart.service';
+import { WishlistService } from '../../../core/services/wishlist.service';
 import { Product } from '../../../core/models/product.model';
 import { CartItem } from '../../../core/models/cart.model';
 
@@ -49,8 +50,9 @@ export class ProductDetail implements OnInit, OnDestroy {
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
+    private wishlistService: WishlistService,
     private messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.params
@@ -140,6 +142,37 @@ export class ProductDetail implements OnInit, OnDestroy {
 
     // Reset quantity
     this.quantity = 1;
+  }
+
+  /**
+   * Toggle product in wishlist
+   */
+  toggleWishlist(): void {
+    if (!this.product) return;
+
+    if (this.isInWishlist()) {
+      this.wishlistService.removeFromWishlist(this.product.id);
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Removed from Wishlist',
+        detail: `${this.product.name} has been removed from your wishlist.`
+      });
+    } else {
+      this.wishlistService.addToWishlist(this.product);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Added to Wishlist',
+        detail: `${this.product.name} has been added to your wishlist.`
+      });
+    }
+  }
+
+  /**
+   * Check if current product is in wishlist
+   */
+  isInWishlist(): boolean {
+    if (!this.product) return false;
+    return this.wishlistService.isInWishlist(this.product.id);
   }
 
   /**

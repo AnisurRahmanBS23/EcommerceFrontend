@@ -30,6 +30,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/products/product-detail/product-detail').then(m => m.ProductDetail)
   },
   {
+    path: 'wishlist',
+    loadComponent: () => import('./features/wishlist/wishlist').then(m => m.Wishlist)
+  },
+  {
     path: 'cart',
     canActivate: [authGuard],
     children: [

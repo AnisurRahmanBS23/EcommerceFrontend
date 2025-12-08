@@ -1,0 +1,87 @@
+<div class="wishlist-container">
+    <p-toast></p-toast>
+
+    <!-- Header Section -->
+    <div class="wishlist-header">
+        <div class="header-content">
+            <h1>
+                <i class="pi pi-heart-fill"></i>
+                My Wishlist
+            </h1>
+            <p class="subtitle">{{ wishlistItems.length }} {{ wishlistItems.length === 1 ? 'item' : 'items' }}</p>
+        </div>
+        <div class="header-actions">
+            <button pButton type="button" label="Continue Shopping" icon="pi pi-shopping-bag" class="p-button-outlined"
+                (click)="continueShopping()"></button>
+            @if (wishlistItems.length > 0) {
+            <button pButton type="button" label="Clear Wishlist" icon="pi pi-trash"
+                class="p-button-outlined p-button-danger" (click)="clearWishlist()"></button>
+            }
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    @if (wishlistItems.length === 0) {
+    <div class="empty-state">
+        <i class="pi pi-heart"></i>
+        <h2>Your Wishlist is Empty</h2>
+        <p>Save your favorite products here to buy them later.</p>
+        <button pButton type="button" label="Start Shopping" icon="pi pi-shopping-cart"
+            (click)="continueShopping()"></button>
+    </div>
+    }
+
+    <!-- Wishlist Grid -->
+    @if (wishlistItems.length > 0) {
+    <div class="wishlist-grid">
+        @for (item of wishlistItems; track item.productId) {
+        <div class="wishlist-card">
+            <!-- Product Image -->
+            <div class="product-image-container" (click)="viewProduct(item.productId)">
+                @if (item.imageUrl) {
+                <img [src]="item.imageUrl" [alt]="item.productName" class="product-image"
+                    (error)="onImageError($event)" />
+                } @else {
+                <div class="no-image">
+                    <i class="pi pi-heart"></i>
+                    <span>No image</span>
+                </div>
+                }
+
+                <!-- Remove Button -->
+                <button pButton type="button" icon="pi pi-times"
+                    class="p-button-rounded p-button-danger p-button-text remove-btn"
+                    (click)="removeFromWishlist(item.productId)" pTooltip="Remove from wishlist"
+                    tooltipPosition="left"></button>
+            </div>
+
+            <!-- Product Info -->
+            <div class="product-info">
+                <h3 class="product-name" (click)="viewProduct(item.productId)">
+                    {{ item.productName }}
+                </h3>
+
+                <div class="price-stock">
+                    <span class="product-price">৳{{ item.price | number:'1.2-2' }}</span>
+                    <p-tag [value]="getStockLabel(item.stock)" [severity]="getStockSeverity(item.stock)"></p-tag>
+                </div>
+
+                <div class="product-actions">
+                    <button pButton type="button" label="Add to Cart" icon="pi pi-shopping-cart"
+                        class="p-button-sm add-to-cart-btn" [disabled]="item.stock <= 0"
+                        (click)="moveToCart(item)"></button>
+
+                    <button pButton type="button" label="View Details" icon="pi pi-eye"
+                        class="p-button-sm p-button-outlined" (click)="viewProduct(item.productId)"></button>
+                </div>
+
+                <div class="added-date">
+                    <i class="pi pi-calendar"></i>
+                    <span>Added {{ item.addedAt | date:'mediumDate' }}</span>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

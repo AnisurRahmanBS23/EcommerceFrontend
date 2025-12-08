@@ -110,10 +110,6 @@
               class="p-button-lg add-to-cart-btn" [disabled]="!isQuantityValid() || product.stock <= 0"
               (click)="addToCart()"></button>
 
-            <button pButton type="button" [label]="isInWishlist() ? 'Remove from Wishlist' : 'Add to Wishlist'"
-              [icon]="isInWishlist() ? 'pi pi-heart-fill' : 'pi pi-heart'" class="p-button-lg wishlist-detail-btn"
-              [class.in-wishlist]="isInWishlist()" (click)="toggleWishlist()"></button>
-
             <button pButton type="button" label="View Cart" icon="pi pi-eye" class="p-button-lg p-button-outlined"
               (click)="goToCart()"></button>
           </div>

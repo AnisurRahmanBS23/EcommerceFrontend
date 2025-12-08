@@ -15,10 +15,12 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { PaginatorModule } from 'primeng/paginator';
+import { TooltipModule } from 'primeng/tooltip';
 
 // Services & Models
 import { ProductService } from '../../../core/services/product.service';
 import { CartService } from '../../../core/services/cart.service';
+import { WishlistService } from '../../../core/services/wishlist.service';
 import { Product, ProductQueryParams } from '../../../core/models/product.model';
 import { CartItem } from '../../../core/models/cart.model';
 
@@ -41,7 +43,8 @@ interface SortOption {
     SkeletonModule,
     ToastModule,
     InputNumberModule,
-    PaginatorModule
+    PaginatorModule,
+    TooltipModule
   ],
   providers: [MessageService],
   templateUrl: './product-list.html',
@@ -87,6 +90,7 @@ export class ProductList implements OnInit, OnDestroy {
   constructor(
     private productService: ProductService,
     private cartService: CartService,
+    private wishlistService: WishlistService,
     private messageService: MessageService,
     private router: Router
   ) { }
@@ -239,6 +243,39 @@ export class ProductList implements OnInit, OnDestroy {
       summary: 'Added to Cart',
       detail: `${product.name} has been added to your cart.`
     });
+  }
+
+  /**
+   * Toggle product in wishlist
+   */
+  toggleWishlist(product: Product, event?: Event): void {
+    // Prevent navigation to product detail when clicking wishlist button
+    if (event) {
+      event.stopPropagation();
+    }
+
+    if (this.isInWishlist(product.id)) {
+      this.wishlistService.removeFromWishlist(product.id);
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Removed from Wishlist',
+        detail: `${product.name} has been removed from your wishlist.`
+      });
+    } else {
+      this.wishlistService.addToWishlist(product);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Added to Wishlist',
+        detail: `${product.name} has been added to your wishlist.`
+      });
+    }
+  }
+
+  /**
+   * Check if product is in wishlist
+   */
+  isInWishlist(productId: string): boolean {
+    return this.wishlistService.isInWishlist(productId);
   }
 
   /**
