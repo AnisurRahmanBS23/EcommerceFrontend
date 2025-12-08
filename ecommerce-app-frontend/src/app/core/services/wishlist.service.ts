@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { WishlistItem } from '../models/wishlist.model';
 import { Product } from '../models/product.model';
 
@@ -9,6 +9,8 @@ export class WishlistService {
     private readonly STORAGE_KEY = 'ecommerce_wishlist';
     private wishlistItems = signal<WishlistItem[]>([]);
 
+    public readonly itemCount = computed(() => this.wishlistItems().length);
+
     constructor() {
         this.loadWishlistFromStorage();
     }
@@ -18,13 +20,6 @@ export class WishlistService {
      */
     get items() {
         return this.wishlistItems.asReadonly();
-    }
-
-    /**
-     * Get wishlist count as a signal
-     */
-    get itemCount() {
-        return signal(this.wishlistItems().length);
     }
 
     /**
