@@ -2,10 +2,18 @@
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 }
 
 .back-button-section {
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
 }
 
 .detail-card {
@@ -13,6 +21,11 @@
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    border-radius: 8px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .product-detail-grid {
@@ -24,6 +37,12 @@
   @media (max-width: 992px) {
     grid-template-columns: 1fr;
     gap: 2rem;
+    padding: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    gap: 1.5rem;
+    padding: 1rem;
   }
 }
 
@@ -36,12 +55,29 @@
   border-radius: 8px;
   overflow: hidden;
   min-height: 500px;
+  aspect-ratio: 1 / 1;
+
+  @media (max-width: 992px) {
+    min-height: 400px;
+    aspect-ratio: 16 / 9;
+  }
+
+  @media (max-width: 768px) {
+    min-height: 300px;
+    aspect-ratio: 4 / 3;
+  }
 
   .product-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     max-height: 600px;
+    padding: 1rem;
+
+    @media (max-width: 768px) {
+      padding: 0.5rem;
+      max-height: 400px;
+    }
   }
 
   .no-image {
@@ -53,15 +89,27 @@
     color: var(--text-color-secondary);
     background: linear-gradient(135deg, var(--surface-100) 0%, var(--surface-200) 100%);
 
+    @media (max-width: 768px) {
+      height: 300px;
+    }
+
     i {
       font-size: 5rem;
       margin-bottom: 1rem;
       opacity: 0.5;
+
+      @media (max-width: 768px) {
+        font-size: 3rem;
+      }
     }
 
     span {
       font-size: 1.2rem;
       font-weight: 500;
+
+      @media (max-width: 768px) {
+        font-size: 1rem;
+      }
     }
   }
 }
@@ -69,22 +117,27 @@
 .info-section {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
 .product-name {
   font-size: 2.5rem;
   font-weight: 700;
   color: var(--text-color);
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.5rem 0;
   line-height: 1.2;
 
-  @media (max-width: 768px) {
+  @media (max-width: 992px) {
     font-size: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
   }
 }
 
 .stock-status {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .price-section {
@@ -93,10 +146,18 @@
   gap: 1rem;
   margin: 1rem 0;
 
+  @media (max-width: 768px) {
+    margin: 0.75rem 0;
+  }
+
   .price-label {
     font-size: 1.2rem;
     color: var(--text-color-secondary);
     font-weight: 500;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
   }
 
   .product-price {
@@ -104,8 +165,12 @@
     font-weight: 700;
     color: var(--primary-color);
 
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
       font-size: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 1.75rem;
     }
   }
 }
@@ -115,7 +180,12 @@
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--text-color);
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.75rem 0;
+
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+      margin: 0 0 0.5rem 0;
+    }
   }
 
   .product-description {
@@ -124,13 +194,22 @@
     color: var(--text-color-secondary);
     margin: 0;
     white-space: pre-line;
+
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
   }
 }
 
 .product-meta {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
+
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
 
   .meta-item {
     display: flex;
@@ -138,9 +217,18 @@
     gap: 0.75rem;
     font-size: 0.95rem;
 
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+      gap: 0.5rem;
+    }
+
     i {
       color: var(--primary-color);
       font-size: 1.1rem;
+
+      @media (max-width: 768px) {
+        font-size: 1rem;
+      }
     }
 
     span {
@@ -156,6 +244,10 @@
 
 .action-section {
   margin-top: 1.5rem;
+
+  @media (max-width: 768px) {
+    margin-top: 1rem;
+  }
 }
 
 .quantity-selector {
@@ -164,10 +256,19 @@
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
   label {
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-color);
+
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+    }
   }
 
   ::ng-deep {
@@ -176,6 +277,20 @@
 
       @media (max-width: 768px) {
         width: 100%;
+      }
+
+      .p-inputnumber-button {
+        width: 2.5rem;
+
+        @media (max-width: 768px) {
+          width: 2rem;
+        }
+      }
+
+      .p-inputnumber-input {
+        @media (max-width: 768px) {
+          font-size: 1rem;
+        }
       }
     }
   }
@@ -188,6 +303,7 @@
 
   @media (max-width: 768px) {
     flex-direction: column;
+    gap: 0.75rem;
 
     button {
       width: 100%;
@@ -197,6 +313,10 @@
   .add-to-cart-btn {
     flex: 1;
     min-width: 200px;
+
+    @media (max-width: 768px) {
+      min-width: auto;
+    }
   }
 }
 
@@ -211,12 +331,27 @@
   border-radius: 6px;
   color: #f57c00;
 
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+
   i {
     font-size: 1.3rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+    }
   }
 
   span {
     font-weight: 500;
+    font-size: 0.95rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+    }
   }
 }
 
@@ -231,12 +366,27 @@
   border-radius: 6px;
   color: #d32f2f;
 
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+
   i {
     font-size: 1.3rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+    }
   }
 
   span {
     font-weight: 500;
+    font-size: 0.95rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+    }
   }
 }
 
@@ -249,10 +399,20 @@
   text-align: center;
   min-height: 500px;
 
+  @media (max-width: 768px) {
+    padding: 2rem 1rem;
+    min-height: 400px;
+  }
+
   i {
     font-size: 5rem;
     color: var(--red-500);
     margin-bottom: 1.5rem;
+
+    @media (max-width: 768px) {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
   }
 
   h2 {
@@ -260,22 +420,41 @@
     font-weight: 600;
     color: var(--text-color);
     margin: 0 0 1rem 0;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+      margin: 0 0 0.75rem 0;
+    }
   }
 
   p {
     font-size: 1.1rem;
     color: var(--text-color-secondary);
     margin: 0 0 2rem 0;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      margin: 0 0 1.5rem 0;
+    }
   }
 }
 
 ::ng-deep {
   .p-divider {
     margin: 1.5rem 0;
+
+    @media (max-width: 768px) {
+      margin: 1rem 0;
+    }
   }
 
   .p-tag {
     font-size: 0.9rem;
     padding: 0.5rem 1rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+    }
   }
 }

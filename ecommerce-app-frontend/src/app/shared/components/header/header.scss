@@ -8,10 +8,24 @@
     .p-toolbar-group-right {
       gap: 0.5rem;
     }
+
+    // Mobile responsiveness
+    @media (max-width: 768px) {
+      padding: 0.75rem 1rem;
+
+      .p-toolbar-group-left,
+      .p-toolbar-group-right {
+        gap: 0.25rem;
+      }
+    }
   }
 
   .text-2xl {
     font-size: 1.5rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.25rem;
+    }
   }
 
   .font-bold {
@@ -40,14 +54,26 @@
 
   .gap-2 {
     gap: 0.5rem;
+
+    @media (max-width: 768px) {
+      gap: 0.25rem;
+    }
   }
 
   .gap-3 {
     gap: 0.75rem;
+
+    @media (max-width: 768px) {
+      gap: 0.5rem;
+    }
   }
 
   .mr-2 {
     margin-right: 0.5rem;
+
+    @media (max-width: 768px) {
+      margin-right: 0.25rem;
+    }
   }
 
   .ml-2 {
@@ -59,6 +85,11 @@
     font-weight: 600;
     font-size: 0.875rem;
     padding: 0.25rem 0.75rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+    }
   }
 
   // Mode Switcher Styling
@@ -77,6 +108,46 @@
           border-color: var(--primary-color);
           color: var(--primary-color-text);
         }
+
+        // Hide text on mobile, show icons only
+        @media (max-width: 768px) {
+          padding: 0.5rem;
+          font-size: 0;
+
+          span {
+            display: none;
+          }
+
+          i {
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+
+  // Button responsive styles - hide labels on mobile
+  .p-button {
+    @media (max-width: 768px) {
+      &:not(.p-button-icon-only) {
+        .p-button-label {
+          display: none;
+        }
+
+        padding: 0.5rem;
+        min-width: auto;
+      }
+    }
+  }
+
+  // Ensure cart badge is visible on mobile
+  .p-button-badge {
+    @media (max-width: 768px) {
+      .p-badge {
+        min-width: 1.25rem;
+        height: 1.25rem;
+        line-height: 1.25rem;
+        font-size: 0.65rem;
       }
     }
   }
