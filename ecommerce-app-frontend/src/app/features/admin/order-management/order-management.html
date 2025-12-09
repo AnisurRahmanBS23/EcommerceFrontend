@@ -193,6 +193,34 @@
     </ng-template>
   </p-dialog>
 
+  <!-- Status Update Dialog -->
+  <p-dialog [(visible)]="displayStatusDialog" [modal]="true" [style]="{width: '450px', 'min-height': '350px'}"
+    [draggable]="false" [resizable]="false" header="Update Order Status">
+    <div class="status-update-content" *ngIf="selectedOrder" style="height: 100%; min-height: 250px;">
+      <p class="dialog-info">
+        Update status for Order <strong>{{ selectedOrder.id.substring(0, 8) }}...</strong>
+      </p>
+
+      <div class="field">
+        <label for="status">New Status</label>
+        <p-select [options]="statusOptions.slice(1)" [(ngModel)]="newStatus" optionLabel="label" optionValue="value"
+          placeholder="Select a Status" [style]="{'width': '100%'}"></p-select>
+      </div>
+
+      <div class="warning-message" *ngIf="newStatus === orderStatusEnum.Cancelled">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>Creating a cancellation will refund the customer if payment was captured.</span>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton type="button" label="Cancel" icon="pi pi-times" class="p-button-text"
+        (click)="displayStatusDialog = false"></button>
+      <button pButton type="button" label="Update Status" icon="pi pi-check" (click)="updateOrderStatus()"
+        [loading]="updatingStatus" [disabled]="!selectedOrder"></button>
+    </ng-template>
+  </p-dialog>
+
   <!-- Order Notes Dialog -->
   <p-dialog [(visible)]="displayNotesDialog" [modal]="true" [style]="{width: '700px', maxHeight: '80vh'}"
     [draggable]="false" [resizable]="false" header="Order Notes">
