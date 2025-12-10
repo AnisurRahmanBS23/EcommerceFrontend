@@ -59,7 +59,7 @@ export class AdminService {
   }
 
   updateOrderStatus(orderId: string, request: UpdateOrderStatusRequest): Observable<any> {
-    return this.http.put(`${this.orderApiUrl}/${orderId}/status`, request);
+    return this.http.put(`${this.orderApiUrl}/orders/${orderId}/status`, request);
   }
 
   // Order notes endpoints

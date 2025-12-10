@@ -13,7 +13,7 @@ import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TagModule } from 'primeng/tag';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -38,6 +38,7 @@ export class Header implements OnInit {
   cartService = inject(CartService);
   wishlistService = inject(WishlistService);
   router = inject(Router);
+  messageService = inject(MessageService);
 
   isAuthenticated = this.authService.isAuthenticated;
   currentUser = this.authService.currentUser$;
@@ -171,5 +172,15 @@ export class Header implements OnInit {
    */
   getModeBadgeSeverity(): 'success' | 'info' | 'warn' | 'danger' {
     return this.currentMode === 'admin' ? 'warn' : 'info';
+  }
+
+  testNotification() {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Test Notification',
+      detail: 'This is a test notification to verify the toast component.',
+      key: 'global-toast',
+      life: 5000
+    });
   }
 }

@@ -37,6 +37,11 @@
       </p-selectButton>
       }
 
+      <!-- Test Notification Button (Temporary) -->
+      <p-button icon="pi pi-bell" [text]="true" (onClick)="testNotification()" pTooltip="Test Notification"
+        tooltipPosition="bottom">
+      </p-button>
+
       <!-- Wishlist Button -->
       <p-button icon="pi pi-heart" [text]="true" [badge]="wishlistItemCount().toString()" badgeClass="p-badge-danger"
         (onClick)="navigateToWishlist()" pTooltip="Wishlist" tooltipPosition="bottom">
